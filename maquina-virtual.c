@@ -23,6 +23,7 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int segmentos[]) {
         //leer tamaño de codigo del archivo
         //cargar codigo en memoria si es que no la excede
         //inicializar tabla de segmentos
+        //inicializar punteros de inicio de segmentos
         fclose(archbin);
     }
 }
