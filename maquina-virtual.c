@@ -8,16 +8,20 @@ int main(int argc, char *argv[]) {
     int registros[TAM_REGISTROS]; //32 registros de 32 bits
     char memoria[TAM_MEMORIA];  //16 KiB
     int tablasegmentos[TAM_TABLA_SEGMENTOS]; //8 entradas de 32 bits
+
+    leerArchivoEntrada(argv[1], memoria, tablasegmentos, registros);
+    ejecutarPrograma(memoria, registros, tablasegmentos);
+
     return 0;
 }
 
-void leerArchivoEntrada(char nombreArchivo[], char memoria[], int segmentos[]) {
+void leerArchivoEntrada(char nombreArchivo[], char memoria[], int segmentos[], int registros[]) {
     FILE *archbin;
     char aux; //variable auxiliar para leer byte a byte
 
-    archbin = fopen(argv[1], "rb");
+    archbin = fopen(nombreArchivo, "rb");
     if (archbin == NULL) {
-        printf("no se pudo abrir el archivo %s\n", argv[1]);
+        printf("no se pudo abrir el archivo %s\n", nombreArchivo);
     }
     else {
         //leer tamaño de codigo del archivo
