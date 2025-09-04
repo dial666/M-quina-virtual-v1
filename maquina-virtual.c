@@ -76,9 +76,14 @@ void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]) {
     registros[26] = 0;
     //inicializar DS
     registros[27] = 0;
-    registros[27] = registros[27] | 0x000010000;
+    registros[27] = registros[27] | 0x00010000;
     //inicializar IP = CS
     registros[3] = registros[26];
+}
+
+int verificarNumOperacion(char primer_byte){
+    primer_byte &= 0b00011111;
+    return (primer_byte <= 0x1F) && !(primer_byte > 0x08 && primer_byte < 0x0F);
 }
 
 void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[]) {
