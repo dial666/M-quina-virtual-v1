@@ -8,6 +8,7 @@
 #define CANT_SEGMENTOS 2
 
 void terminarPrograma(char mensaje[]);
+int verificarNumOperacion(char primer_byte);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
@@ -81,7 +82,7 @@ void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]) {
     registros[3] = registros[26];
 }
 
-int verificarNumOperacion(char primer_byte){
+int verificarNumOperacion(char primer_byte){ //parametro = primer byte de instruccion, solo analiza ultimos 5 bits
     primer_byte &= 0b00011111;
     return (primer_byte <= 0x1F) && !(primer_byte > 0x08 && primer_byte < 0x0F);
 }
