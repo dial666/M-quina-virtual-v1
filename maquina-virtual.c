@@ -50,6 +50,11 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos
                     memoria[i] = lineaCodigo;
                     i++;
                 }
+
+                if(i != tamCodigo){
+                    terminarPrograma("el tamano del codigo especificado en la cabecera no coincide con el tamano real");
+                }
+                
                 inicializarTablaSegmentos(tamCodigo, tablaSegmentos);
                 inicializarPunterosInicioSegmentos(tablaSegmentos, registros);
             }
