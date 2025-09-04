@@ -5,12 +5,14 @@
 #define TAM_MEMORIA 16384
 #define TAM_REGISTROS 32 
 #define TAM_TABLA_SEGMENTOS 8
-#define CANT_SEGMENTOS 2
+#define CANT_BYTES_TAM_CODIGO 2
 
 void terminarPrograma(char mensaje[]);
 int verificarNumOperacion(char primer_byte);
+void mostrarArreglo(char arr[], int n);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]);
+void convertirArregloAInt(char arregloBytes[], int n, int *num);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
 void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]);
 
@@ -27,8 +29,8 @@ int main(int argc, char *argv[]) {
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]) {
     FILE *archBin;
-    int16_t tamCodigo; //variable auxiliar para leer cada dos bytes
-    char lineaCodigo; //variable auxiliar para leer cada 1 byte
+    int tamCodigo; //variable auxiliar para leer cada dos bytes
+    char lineaCodigo, tamCodigoAux[CANT_BYTES_TAM_CODIGO], aux;
     int i;
 
 
@@ -38,27 +40,32 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos
     else {
         //leer tamaño de codigo del archivo
         fseek(archBin, 6, SEEK_SET);
-        if (fread(&tamCodigo, sizeof(tamCodigo), 1, archBin) != 1)
-            terminarPrograma("no se pudo leer el tamano del codigo");
-        else
-            if (tamCodigo > TAM_MEMORIA)
-                terminarPrograma("el tamamo del codigo supera al de la memoria");
-            else {
-                //cargar codigo en memoria
-                printf("%x", tamCodigo);
-                i = 0;
-                while (fread(&lineaCodigo, sizeof(lineaCodigo), 1, archBin) == 1) {
-                    memoria[i] = lineaCodigo;
-                    i++;
-                }
+        i = 0;
+        while (i < CANT_BYTES_TAM_CODIGO && fread(&aux, sizeof(aux), 1, archBin) == 1) {
+            tamCodigoAux[i] = aux;
+            i++;
+        }
 
-                if(i != tamCodigo){
-                    terminarPrograma("el tamano del codigo especificado en la cabecera no coincide con el tamano real");
-                }
-                
-                inicializarTablaSegmentos(tamCodigo, tablaSegmentos);
-                inicializarPunterosInicioSegmentos(tablaSegmentos, registros);
-            }
+        if (i != CANT_BYTES_TAM_CODIGO)
+            terminarPrograma("no se pudo leer el tamano de codigo");
+            
+        convertirArregloAInt(tamCodigoAux, CANT_BYTES_TAM_CODIGO, &tamCodigo);
+
+        if (tamCodigo > TAM_MEMORIA)
+            terminarPrograma("el tamamo del codigo supera al de la memoria");
+
+        i = 0;
+        while (fread(&lineaCodigo, sizeof(lineaCodigo), 1, archBin) == 1) {
+            memoria[i] = lineaCodigo;
+            i++;
+        }
+
+        if(i != tamCodigo)
+            terminarPrograma("el tamano del codigo especificado en la cabecera no coincide con el tamano real");
+
+        inicializarTablaSegmentos(tamCodigo, tablaSegmentos);
+        inicializarPunterosInicioSegmentos(tablaSegmentos, registros);
+        
         fclose(archBin);
     }
 }
@@ -94,4 +101,24 @@ void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[]) {
 void terminarPrograma(char mensaje[]) {
     printf("%s\n", mensaje);
     exit(EXIT_FAILURE);
+}
+
+void convertirArregloAInt(char arregloBytes[], int n, int *num) {
+    int i, aux;
+    int cantBytesDesplazar = n - 1;
+
+    *num = 0;
+    for(i = 0; i < n; i++) {
+        aux = arregloBytes[i];
+        aux = aux << (cantBytesDesplazar * 8);
+        *num = *num | aux;
+        cantBytesDesplazar--;
+    }
+}
+
+
+void mostrarArreglo(char arr[], int n) {
+    int i = 0;
+    for (; i < n; i++)
+        printf("%d\n", arr[i]);
 }
