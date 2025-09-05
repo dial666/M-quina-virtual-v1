@@ -1,31 +1,42 @@
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define TAM_MEMORIA 16384
 #define TAM_REGISTROS 32 
 #define TAM_TABLA_SEGMENTOS 8
 #define CANT_BYTES_TAM_CODIGO 2
 
+typedef struct {
+    char nombre[3];
+    int valor;
+} registro;
+
 void terminarPrograma(char mensaje[]);
 int verificarNumOperacion(char primer_byte);
 void mostrarArreglo(char arr[], int n);
+void ponerNombresRegistros(registro registros[]);
 
-void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]);
+void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], registro registros[]);
 void convertirArregloAInt(char arregloBytes[], int n, int *num);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
-void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]);
+void inicializarPunterosInicioSegmentos(int tablaSegmentos[], registro registros[]);
 
 
-void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[]);
+void ejecutarPrograma(char memoria[], registro registros[], int tablaSegmentos[]);
+int conseguirIndiceReg(char nombReg[], registro registros[]);
 void conseguirIntervaloSegmento(int punteroASegmento, int tablaSegmentos[], int *direccionBase, int *limSegmento);
 int IPEstaEnSegmentoCodigo(int IP, int direccionBase, int limSegmento);
+void decodificarInstruccion(int instruccion, registro registros[]);
+
 
 int main(int argc, char *argv[]) {
-    int registros[TAM_REGISTROS]; //32 registros de 32 bits
+
+    registro registros[TAM_REGISTROS]; //32 registros de 32 bits
     char memoria[TAM_MEMORIA];  //16 KiB
     int tablasegmentos[TAM_TABLA_SEGMENTOS]; //8 entradas de 32 bits
 
+    ponerNombresRegistros(registros);
     leerArchivoEntrada("C:/Users/valen/OneDrive/Documentos/Facultad/Arquitectura/M-quina-virtual-v1/sample.vmx", memoria, tablasegmentos, registros);
     ejecutarPrograma(memoria, registros, tablasegmentos);
 
@@ -47,12 +58,37 @@ void mostrarArreglo(char arr[], int n) {
         printf("%d\n", arr[i]);
 }
 
+//FUNCIONES QUE INCIALIZAN ESTRUCTURAS PROPIAS DE ESTE PROGRAMA Y NO DEL CPU----------------
+
+//horripilante pero me daba paja hacer una función que lea de archivo
+void ponerNombresRegistros(registro registros[]) {
+    strcpy(registros[0].nombre, "LAR");
+    strcpy(registros[1].nombre, "MAR");
+    strcpy(registros[2].nombre, "MBR");
+    strcpy(registros[3].nombre, "IP");
+    strcpy(registros[4].nombre, "OPC");
+    strcpy(registros[5].nombre, "OP1");
+    strcpy(registros[6].nombre, "OP2");
+    strcpy(registros[10].nombre, "EAX");
+    strcpy(registros[11].nombre, "EBX");
+    strcpy(registros[12].nombre, "ECX");
+    strcpy(registros[13].nombre, "EDX");
+    strcpy(registros[14].nombre, "EEX");
+    strcpy(registros[15].nombre, "EFX");
+    strcpy(registros[16].nombre, "AC");
+    strcpy(registros[17].nombre, "CC");
+    strcpy(registros[26].nombre, "CS");
+    strcpy(registros[27].nombre, "DS");
+}
+
 //FUNCIONES USADAS EN LA INICIALIZACIÓN DE LAS ESTRUCTURAS----------------------------------
 
-void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]) {
+void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], registro registros[]) {
     FILE *archBin;
     int tamCodigo; //variable auxiliar para leer cada dos bytes
-    char lineaCodigo, tamCodigoAux[CANT_BYTES_TAM_CODIGO], aux;
+    char lineaCodigo, 
+        tamCodigoAux[CANT_BYTES_TAM_CODIGO], 
+        aux;
     int i;
 
 
@@ -101,19 +137,23 @@ void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]) {
     tablaSegmentos[1] = aux;
 }
 
-void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]) {
+void inicializarPunterosInicioSegmentos(int tablaSegmentos[], registro registros[]) {
+    int indiceCS = conseguirIndiceReg("CS", registros), 
+        indiceDS = conseguirIndiceReg("DS", registros),
+        indiceIP = conseguirIndiceReg("IP", registros);
     //inicialiar CS
-    registros[26] = 0;
+    registros[indiceCS].valor = 0;
     //inicializar DS
-    registros[27] = 0;
-    registros[27] = registros[27] | 0x00010000;
+    registros[indiceDS].valor = 0;
+    registros[indiceDS].valor = registros[indiceDS].valor | 0x00010000;
     //inicializar IP = CS
-    registros[3] = registros[26];
+    registros[indiceIP].valor = registros[26].valor;
 }
 
 void convertirArregloAInt(char arregloBytes[], int n, int *num) {
-    int i, aux;
-    int cantBytesDesplazar = n - 1;
+    int i, 
+        aux,
+        cantBytesDesplazar = n - 1;
 
     *num = 0;
     for(i = 0; i < n; i++) {
@@ -124,17 +164,28 @@ void convertirArregloAInt(char arregloBytes[], int n, int *num) {
     }
 }
 
-//FUNCIONES EXCLUSIVAS DE LA EJECUCIÓN DE LAS INSTRUCCIONES
+//FUNCIONES EXCLUSIVAS DE LA EJECUCIÓN DE LAS INSTRUCCIONES-----------------------------------
 
-void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[]) {
-    int direccionBase, limiteSegmento, i = 0;
+void ejecutarPrograma(char memoria[], registro registros[], int tablaSegmentos[]) {
+    int direccionBase, 
+        limiteSegmento, 
+        i = 0,
+        indiceCS = conseguirIndiceReg("CS", registros),
+        indiceIP = conseguirIndiceReg("IP", registros);
 
-    conseguirIntervaloSegmento(registros[26], tablaSegmentos, &direccionBase, &limiteSegmento);
-    while (IPEstaEnSegmentoCodigo(registros[3], direccionBase, limiteSegmento)) {
-        // registros[3]++;
-        // printf("%d\n", i);
-        // i++;
+    conseguirIntervaloSegmento(registros[indiceCS].valor, tablaSegmentos, &direccionBase, &limiteSegmento);
+    while (IPEstaEnSegmentoCodigo(registros[indiceIP].valor, direccionBase, limiteSegmento)) {
+        decodificarInstruccion(memoria[registros[indiceIP].valor], registros);
+        registros[indiceIP].valor = -1;
     }
+}
+
+//consigue el índice de un registro dado su nombre
+int conseguirIndiceReg(char nombReg[], registro registros[]) {
+    int i = 0;
+    while (strcmp(nombReg, registros[i].nombre) != 0)
+        i++;
+    return i;
 }
 
 //consigue la dirección base y el límite superior de un dado segmento
@@ -150,15 +201,22 @@ int IPEstaEnSegmentoCodigo(int IP, int direccionBase, int limSegmento) {
     return IP >= direccionBase && IP <= limSegmento;
 }
 
-// int getValorRegistro(int OPX, int registros[]) {
-//     int nroRegistro = OPX & 0x0000001F;
-//     if (nroRegistroEsValido(nroRegistro))
-//         return registros[nroRegistro];
-//     else
-//         terminarPrograma("registro invalido");
-// }
+//pone en OPC el número de operación, y en OP1 y OP2 el tipo de operando en el byte más significativo
+void decodificarInstruccion(int instruccion, registro registros[]) {
+    int indiceOP1 = conseguirIndiceReg("OP1", registros), 
+        indiceOP2 = conseguirIndiceReg("OP2", registros), 
+        indiceOPC = conseguirIndiceReg("OPC", registros);
 
-// int verificarNumOperacion(char primer_byte){ //parametro = primer byte de instruccion, solo analiza ultimos 5 bits
-//     primer_byte &= 0b00011111;
-//     return (primer_byte <= 0x1F) && !(primer_byte > 0x08 && primer_byte < 0x0F);
-// }
+    registros[indiceOPC].valor = registros[indiceOP1].valor = registros[indiceOP2].valor = 0;
+
+    //setea OPC
+    registros[indiceOPC].valor = registros[indiceOPC].valor | (instruccion & 0x1F);
+
+    //setea OP1
+    registros[indiceOP1].valor = instruccion & 0x30;
+    registros[indiceOP1].valor = registros[indiceOP1].valor << 20;
+
+    //setea OP2
+    registros[indiceOP2].valor = instruccion & 0xC0;
+    registros[indiceOP2].valor = registros[indiceOP2].valor << 18;
+}
