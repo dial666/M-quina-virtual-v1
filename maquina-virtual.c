@@ -16,16 +16,38 @@ void convertirArregloAInt(char arregloBytes[], int n, int *num);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
 void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]);
 
+
+void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[]);
+void conseguirIntervaloSegmento(int punteroASegmento, int tablaSegmentos[], int *direccionBase, int *limSegmento);
+int IPEstaEnSegmentoCodigo(int IP, int direccionBase, int limSegmento);
+
 int main(int argc, char *argv[]) {
     int registros[TAM_REGISTROS]; //32 registros de 32 bits
     char memoria[TAM_MEMORIA];  //16 KiB
     int tablasegmentos[TAM_TABLA_SEGMENTOS]; //8 entradas de 32 bits
 
     leerArchivoEntrada("C:/Users/valen/OneDrive/Documentos/Facultad/Arquitectura/M-quina-virtual-v1/sample.vmx", memoria, tablasegmentos, registros);
-    //ejecutarPrograma(memoria, registros, tablasegmentos);
+    ejecutarPrograma(memoria, registros, tablasegmentos);
 
     return 0;
 }
+
+//FUNCIÓN QUE TERMINA EL PROGRAMA-----------------------------------------------------------
+
+void terminarPrograma(char mensaje[]) {
+    printf("%s\n", mensaje);
+    exit(EXIT_FAILURE);
+}
+
+//FUNCIONES PARA DEBUGGEAR------------------------------------------------------------------
+
+void mostrarArreglo(char arr[], int n) {
+    int i = 0;
+    for (; i < n; i++)
+        printf("%d\n", arr[i]);
+}
+
+//FUNCIONES USADAS EN LA INICIALIZACIÓN DE LAS ESTRUCTURAS----------------------------------
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]) {
     FILE *archBin;
@@ -89,20 +111,6 @@ void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]) {
     registros[3] = registros[26];
 }
 
-int verificarNumOperacion(char primer_byte){ //parametro = primer byte de instruccion, solo analiza ultimos 5 bits
-    primer_byte &= 0b00011111;
-    return (primer_byte <= 0x1F) && !(primer_byte > 0x08 && primer_byte < 0x0F);
-}
-
-void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[]) {
-    //ciclo de fetch-decode-execute
-}
-
-void terminarPrograma(char mensaje[]) {
-    printf("%s\n", mensaje);
-    exit(EXIT_FAILURE);
-}
-
 void convertirArregloAInt(char arregloBytes[], int n, int *num) {
     int i, aux;
     int cantBytesDesplazar = n - 1;
@@ -116,9 +124,41 @@ void convertirArregloAInt(char arregloBytes[], int n, int *num) {
     }
 }
 
+//FUNCIONES EXCLUSIVAS DE LA EJECUCIÓN DE LAS INSTRUCCIONES
 
-void mostrarArreglo(char arr[], int n) {
-    int i = 0;
-    for (; i < n; i++)
-        printf("%d\n", arr[i]);
+void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[]) {
+    int direccionBase, limiteSegmento, i = 0;
+
+    conseguirIntervaloSegmento(registros[26], tablaSegmentos, &direccionBase, &limiteSegmento);
+    while (IPEstaEnSegmentoCodigo(registros[3], direccionBase, limiteSegmento)) {
+        // registros[3]++;
+        // printf("%d\n", i);
+        // i++;
+    }
 }
+
+//consigue la dirección base y el límite superior de un dado segmento
+void conseguirIntervaloSegmento(int punteroASegmento, int tablaSegmentos[], int *direccionBase, int *limSegmento) {
+    punteroASegmento = punteroASegmento >> 16;
+    *direccionBase = tablaSegmentos[punteroASegmento];
+    *direccionBase = *direccionBase >> 16;
+    *limSegmento = (tablaSegmentos[punteroASegmento] & 0x0000FFFF) + *direccionBase;
+}
+
+//verifica que el IP esté dentro de los límites del segmento de código
+int IPEstaEnSegmentoCodigo(int IP, int direccionBase, int limSegmento) {
+    return IP >= direccionBase && IP <= limSegmento;
+}
+
+// int getValorRegistro(int OPX, int registros[]) {
+//     int nroRegistro = OPX & 0x0000001F;
+//     if (nroRegistroEsValido(nroRegistro))
+//         return registros[nroRegistro];
+//     else
+//         terminarPrograma("registro invalido");
+// }
+
+// int verificarNumOperacion(char primer_byte){ //parametro = primer byte de instruccion, solo analiza ultimos 5 bits
+//     primer_byte &= 0b00011111;
+//     return (primer_byte <= 0x1F) && !(primer_byte > 0x08 && primer_byte < 0x0F);
+// }
