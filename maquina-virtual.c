@@ -15,7 +15,7 @@ typedef struct {
 void terminarPrograma(char mensaje[]);
 int verificarNumOperacion(char primer_byte);
 void mostrarArreglo(char arr[], int n);
-void ponerNombresRegistros(registro registros[]);
+void inicializarRegistros(registro registros[]);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], registro registros[]);
 int convertirArregloAInt(char arregloBytes[], int n);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     char memoria[TAM_MEMORIA];  //16 KiB
     int tablasegmentos[TAM_TABLA_SEGMENTOS]; //8 entradas de 32 bits
 
-    ponerNombresRegistros(registros);
+    inicializarRegistros(registros);
     leerArchivoEntrada("C:/Users/valen/OneDrive/Documentos/Facultad/Arquitectura/M-quina-virtual-v1/sample.vmx", memoria, tablasegmentos, registros);
     ejecutarPrograma(memoria, registros, tablasegmentos);
 
@@ -84,7 +84,7 @@ void mostrarArreglo(char arr[], int n) {
 //FUNCIONES QUE INCIALIZAN ESTRUCTURAS PROPIAS DE ESTE PROGRAMA Y NO DEL CPU----------------
 
 //horripilante pero me daba paja hacer una función que lea de archivo
-void ponerNombresRegistros(registro registros[]) {
+void inicializarRegistros(registro registros[]) {
     strcpy(registros[0].nombre, "LAR");
     strcpy(registros[1].nombre, "MAR");
     strcpy(registros[2].nombre, "MBR");
@@ -167,10 +167,9 @@ void inicializarPunterosInicioSegmentos(int tablaSegmentos[], registro registros
     //inicialiar CS
     registros[indiceCS].valor = 0;
     //inicializar DS
-    registros[indiceDS].valor = 0;
     registros[indiceDS].valor = registros[indiceDS].valor | 0x00010000;
     //inicializar IP = CS
-    registros[indiceIP].valor = registros[26].valor;
+    registros[indiceIP].valor = registros[indiceCS].valor;
 }
 
 //FUNCIONES EXCLUSIVAS DE LA EJECUCIÓN DE LAS INSTRUCCIONES-----------------------------------
@@ -260,3 +259,40 @@ void leerOperandosIncrementarIP(char memoria[], registro registros[], int direcc
     }
     registros[indiceOP1].valor = registros[indiceOP1].valor | convertirArregloAInt(operandoBytes, n);
 }
+
+//verifica que el registro sea de los 16 que son válidos
+int registroEsValido(int nroRegistro) {
+    if (nroRegistro >= 0 && nroRegistro <= 6 || nroRegistro >= 10 && nroRegistro <= 17 || nroRegistro == 26 || nroRegistro == 27)
+        return 1;
+    else
+        terminarPrograma("intento de acceso a un registro invalido");
+}
+
+//retorna el contenido de un registro
+int conseguirValorRegistro(int operando, registro registros[]) {
+    int nroRegistro = operando & 0x0000001F;
+    if (registroEsValido(nroRegistro))
+        return registros[nroRegistro].valor;
+}
+
+//pone la dirección lógica en el LAR
+void prepararLAR(int operando, registro registros[]) {
+    int indiceLAR = conseguirIndiceReg("LAR", registros);
+
+    registros[indiceLAR].valor = 0;
+    registros[indiceLAR].valor = operando & 0x001FFFFF;
+}
+
+// void prepararMAR(registro registros[], int tablaSegmentos[], int cantBytes) {
+//     int indiceMAR = conseguirIndiceReg("MAR", registros),
+//         indiceLAR = conseguirIndiceReg("LAR", registros);
+//     registros[indiceMAR].valor = 0;
+//     cantBytes = cantBytes << 16;
+//     registros[indiceMAR].valor = registros[indiceMAR].valor | cantBytes;
+// }
+
+// int conseguirDirFisica(int dirLogica, int tablaSegmentos[]) {
+//     int indiceSegmento = dirLogica >> 16,
+//         offset = dirLogica & 0x0000FFFF;
+//     return 
+// }
