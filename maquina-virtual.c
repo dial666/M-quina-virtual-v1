@@ -43,11 +43,19 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-//FUNCIÓN QUE TERMINA EL PROGRAMA-----------------------------------------------------------
+//FUNCIONES QUE COMPARTEN EL BLOQUE DE INICIALIZACIÓN Y EL DE EJECUCIÓN DE INSTRUCCIONES--------------------------
 
 void terminarPrograma(char mensaje[]) {
     printf("%s\n", mensaje);
     exit(EXIT_FAILURE);
+}
+
+//consigue el índice de un registro dado su nombre
+int conseguirIndiceReg(char nombReg[], registro registros[]) {
+    int i = 0;
+    while (strcmp(nombReg, registros[i].nombre) != 0)
+        i++;
+    return i;
 }
 
 //FUNCIONES PARA DEBUGGEAR------------------------------------------------------------------
@@ -178,14 +186,6 @@ void ejecutarPrograma(char memoria[], registro registros[], int tablaSegmentos[]
         decodificarInstruccion(memoria[registros[indiceIP].valor], registros);
         registros[indiceIP].valor = -1;
     }
-}
-
-//consigue el índice de un registro dado su nombre
-int conseguirIndiceReg(char nombReg[], registro registros[]) {
-    int i = 0;
-    while (strcmp(nombReg, registros[i].nombre) != 0)
-        i++;
-    return i;
 }
 
 //consigue la dirección base y el límite superior de un dado segmento
