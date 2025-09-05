@@ -18,7 +18,7 @@ void mostrarArreglo(char arr[], int n);
 void ponerNombresRegistros(registro registros[]);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], registro registros[]);
-void convertirArregloAInt(char arregloBytes[], int n, int *num);
+int convertirArregloAInt(char arregloBytes[], int n);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
 void inicializarPunterosInicioSegmentos(int tablaSegmentos[], registro registros[]);
 
@@ -28,7 +28,7 @@ int conseguirIndiceReg(char nombReg[], registro registros[]);
 void conseguirIntervaloSegmento(int punteroASegmento, int tablaSegmentos[], int *direccionBase, int *limSegmento);
 int IPEstaEnSegmentoCodigo(int IP, int direccionBase, int limSegmento);
 void decodificarInstruccion(int instruccion, registro registros[]);
-
+void leerOperandosIncrementarIP(char memoria[], registro registros[], int direccionBase, int limiteSegmento);
 
 int main(int argc, char *argv[]) {
 
@@ -58,12 +58,27 @@ int conseguirIndiceReg(char nombReg[], registro registros[]) {
     return i;
 }
 
+int convertirArregloAInt(char arregloBytes[], int n) {
+    int i, 
+        num, aux,
+        cantBytesDesplazar = n - 1;
+
+    num = 0;
+    for(i = 0; i < n; i++) {
+        aux = (unsigned char) arregloBytes[i];
+        aux = aux << (cantBytesDesplazar * 8);
+        num = num | aux;
+        cantBytesDesplazar--;
+    }
+    return num;
+}
+
 //FUNCIONES PARA DEBUGGEAR------------------------------------------------------------------
 
 void mostrarArreglo(char arr[], int n) {
     int i = 0;
     for (; i < n; i++)
-        printf("%d\n", arr[i]);
+        printf("%x\n", arr[i]);
 }
 
 //FUNCIONES QUE INCIALIZAN ESTRUCTURAS PROPIAS DE ESTE PROGRAMA Y NO DEL CPU----------------
@@ -115,7 +130,7 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos
         if (i != CANT_BYTES_TAM_CODIGO)
             terminarPrograma("no se pudo leer el tamano de codigo");
             
-        convertirArregloAInt(tamCodigoAux, CANT_BYTES_TAM_CODIGO, &tamCodigo);
+        tamCodigo = convertirArregloAInt(tamCodigoAux, CANT_BYTES_TAM_CODIGO);
 
         if (tamCodigo > TAM_MEMORIA)
             terminarPrograma("el tamamo del codigo supera al de la memoria");
@@ -158,20 +173,6 @@ void inicializarPunterosInicioSegmentos(int tablaSegmentos[], registro registros
     registros[indiceIP].valor = registros[26].valor;
 }
 
-void convertirArregloAInt(char arregloBytes[], int n, int *num) {
-    int i, 
-        aux,
-        cantBytesDesplazar = n - 1;
-
-    *num = 0;
-    for(i = 0; i < n; i++) {
-        aux = arregloBytes[i];
-        aux = aux << (cantBytesDesplazar * 8);
-        *num = *num | aux;
-        cantBytesDesplazar--;
-    }
-}
-
 //FUNCIONES EXCLUSIVAS DE LA EJECUCIÓN DE LAS INSTRUCCIONES-----------------------------------
 
 void ejecutarPrograma(char memoria[], registro registros[], int tablaSegmentos[]) {
@@ -184,6 +185,7 @@ void ejecutarPrograma(char memoria[], registro registros[], int tablaSegmentos[]
     conseguirIntervaloSegmento(registros[indiceCS].valor, tablaSegmentos, &direccionBase, &limiteSegmento);
     while (IPEstaEnSegmentoCodigo(registros[indiceIP].valor, direccionBase, limiteSegmento)) {
         decodificarInstruccion(memoria[registros[indiceIP].valor], registros);
+        leerOperandosIncrementarIP(memoria, registros, direccionBase, limiteSegmento);
         registros[indiceIP].valor = -1;
     }
 }
@@ -198,7 +200,13 @@ void conseguirIntervaloSegmento(int punteroASegmento, int tablaSegmentos[], int 
 
 //verifica que el IP esté dentro de los límites del segmento de código
 int IPEstaEnSegmentoCodigo(int IP, int direccionBase, int limSegmento) {
-    return IP >= direccionBase && IP <= limSegmento;
+    if (IP >= direccionBase && IP <= limSegmento)
+        return 1;
+    else
+        if (IP = -1)
+            return 0;
+        else
+            terminarPrograma("IP apunta a una direccion de memoria no permitida");
 }
 
 //pone en OPC el número de operación, y en OP1 y OP2 el tipo de operando en el byte más significativo
@@ -213,10 +221,42 @@ void decodificarInstruccion(int instruccion, registro registros[]) {
     registros[indiceOPC].valor = registros[indiceOPC].valor | (instruccion & 0x1F);
 
     //setea OP1
-    registros[indiceOP1].valor = instruccion & 0x30;
+    registros[indiceOP1].valor = registros[indiceOP1].valor | (instruccion & 0x30);
     registros[indiceOP1].valor = registros[indiceOP1].valor << 20;
 
     //setea OP2
-    registros[indiceOP2].valor = instruccion & 0xC0;
+    registros[indiceOP2].valor = registros[indiceOP2].valor | instruccion & 0xC0;
     registros[indiceOP2].valor = registros[indiceOP2].valor << 18;
+}
+
+//obtiene la cantidad de bytes que tiene el operando, lee dichos bytes de la memoria y los guarda en un arreglo para luego pasarlo a un int
+void leerOperandosIncrementarIP(char memoria[], registro registros[], int direccionBase, int limiteSegmento) {
+    int indiceOP1 = conseguirIndiceReg("OP1", registros),
+        indiceOP2 = conseguirIndiceReg("OP2", registros),
+        indiceIP = conseguirIndiceReg("IP", registros),
+        i, n;
+    char operandoBytes[4];
+    
+    //incremento IP para pararme en el byte que tengo que leer
+    registros[indiceIP].valor++;
+
+    //leo el operando B
+    n = registros[indiceOP2].valor >> 24;
+    i = 0;
+    while (IPEstaEnSegmentoCodigo(registros[indiceIP].valor, direccionBase, limiteSegmento) && i < n) {
+        operandoBytes[i] = memoria[registros[indiceIP].valor];
+        i++;
+        registros[indiceIP].valor++;
+    }
+    registros[indiceOP2].valor = registros[indiceOP2].valor | convertirArregloAInt(operandoBytes, n);
+    
+    //leo operando A
+    n = registros[indiceOP1].valor >> 24;
+    i = 0;
+    while (IPEstaEnSegmentoCodigo(registros[indiceIP].valor, direccionBase, limiteSegmento) && i < n) {
+        operandoBytes[i] = memoria[registros[indiceIP].valor];
+        i++;
+        registros[indiceIP].valor++;
+    }
+    registros[indiceOP1].valor = registros[indiceOP1].valor | convertirArregloAInt(operandoBytes, n);
 }
