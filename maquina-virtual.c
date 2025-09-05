@@ -136,7 +136,7 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos
             terminarPrograma("el tamamo del codigo supera al de la memoria");
 
         i = 0;
-        while (fread(&lineaCodigo, sizeof(lineaCodigo), 1, archBin) == 1) {
+        while (i <= tamCodigo && fread(&lineaCodigo, sizeof(lineaCodigo), 1, archBin) == 1) {
             memoria[i] = lineaCodigo;
             i++;
         }
@@ -203,7 +203,7 @@ int IPEstaEnSegmentoCodigo(int IP, int direccionBase, int limSegmento) {
     if (IP >= direccionBase && IP <= limSegmento)
         return 1;
     else
-        if (IP = -1)
+        if (IP == -1)
             return 0;
         else
             terminarPrograma("IP apunta a una direccion de memoria no permitida");
@@ -225,7 +225,7 @@ void decodificarInstruccion(int instruccion, registro registros[]) {
     registros[indiceOP1].valor = registros[indiceOP1].valor << 20;
 
     //setea OP2
-    registros[indiceOP2].valor = registros[indiceOP2].valor | instruccion & 0xC0;
+    registros[indiceOP2].valor = registros[indiceOP2].valor | (instruccion & 0xC0);
     registros[indiceOP2].valor = registros[indiceOP2].valor << 18;
 }
 
