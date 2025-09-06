@@ -271,16 +271,21 @@ int registroEsValido(int nroRegistro) {
 //retorna el contenido de un registro
 int conseguirValorRegistro(int operando, registro registros[]) {
     int nroRegistro = operando & 0x0000001F;
-    if (registroEsValido(nroRegistro))
-        return registros[nroRegistro].valor;
+    return registros[nroRegistro].valor;
 }
 
 //pone la dirección lógica en el LAR
-void prepararLAR(int operando, registro registros[]) {
-    int indiceLAR = conseguirIndiceReg("LAR", registros);
+void prepararLAR(int operandoMemoria, registro registros[]) {
+    int indiceLAR = conseguirIndiceReg("LAR", registros),
+        nroRegistro;
 
-    registros[indiceLAR].valor = 0;
-    registros[indiceLAR].valor = operando & 0x001FFFFF;
+    //quito el tipo de operando en el primer byte
+    operandoMemoria = operandoMemoria & 0x00FFFFFF;
+    //me quedo con el número de registro
+    nroRegistro = operandoMemoria >> 16;
+    if (registroEsValido(nroRegistro))
+        //pongo en el LAR la dirección lógica que aparece en el registro y a eso le sumo el offset que está en el operando
+        registros[indiceLAR].valor = registros[nroRegistro].valor + (operandoMemoria & 0x0000FFFF);
 }
 
 // void prepararMAR(registro registros[], int tablaSegmentos[], int cantBytes) {
