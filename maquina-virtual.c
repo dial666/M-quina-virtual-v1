@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+ #include <math.h>
 
 #define TAM_MEMORIA 16384
 #define TAM_REGISTROS 32 
@@ -191,10 +192,14 @@ void ejecutarPrograma(char memoria[], registro registros[], int tablaSegmentos[]
 
 //consigue la dirección base y el límite superior de un dado segmento
 void conseguirIntervaloSegmento(int punteroASegmento, int tablaSegmentos[], int *direccionBase, int *limSegmento) {
+    //consigo el indice del segmento
     punteroASegmento = punteroASegmento >> 16;
-    *direccionBase = tablaSegmentos[punteroASegmento];
-    *direccionBase = *direccionBase >> 16;
-    *limSegmento = (tablaSegmentos[punteroASegmento] & 0x0000FFFF) + *direccionBase;
+    //verifico que ese indice esté dentro de los limites de la tabla y que tenga un valor valido
+    if (indiceSegmentoEsValido(punteroASegmento, tablaSegmentos)) {
+        *direccionBase = tablaSegmentos[punteroASegmento];
+        *direccionBase = *direccionBase >> 16;
+        *limSegmento = (tablaSegmentos[punteroASegmento] & 0x0000FFFF) + *direccionBase;
+    }
 }
 
 //verifica que el IP esté dentro de los límites del segmento de código
@@ -288,16 +293,52 @@ void prepararLAR(int operandoMemoria, registro registros[]) {
         registros[indiceLAR].valor = registros[nroRegistro].valor + (operandoMemoria & 0x0000FFFF);
 }
 
-// void prepararMAR(registro registros[], int tablaSegmentos[], int cantBytes) {
-//     int indiceMAR = conseguirIndiceReg("MAR", registros),
-//         indiceLAR = conseguirIndiceReg("LAR", registros);
-//     registros[indiceMAR].valor = 0;
-//     cantBytes = cantBytes << 16;
-//     registros[indiceMAR].valor = registros[indiceMAR].valor | cantBytes;
-// }
+//valida la cantidad de bytes que se quieren leer/escribir de memoria. en la primera parte siempre son 4 bytes
+int cantBytesEsValida(int cantBytes) {
+    if (cantBytes <= TAM_MEMORIA && cantBytes >= 0)
+        return 1;
+    else
+        terminarPrograma("se intentó leer/escribir una cantidad de bytes invalida de memoria");
+}
 
-// int conseguirDirFisica(int dirLogica, int tablaSegmentos[]) {
-//     int indiceSegmento = dirLogica >> 16,
-//         offset = dirLogica & 0x0000FFFF;
-//     return 
-// }
+void prepararMAR(registro registros[], int tablaSegmentos[], int cantBytes) {
+    int indiceMAR, 
+        indiceLAR;
+
+    if (cantBytesEsValida(cantBytes)) {
+        indiceMAR = conseguirIndiceReg("MAR", registros),
+        indiceLAR = conseguirIndiceReg("LAR", registros);
+
+        //pongo en los primeros 2 bytes del MAR la cantidad de bytes a leer/escribir
+        registros[indiceMAR].valor = cantBytes << 16;
+        //pongo en el resto la dirección física si es válida
+        registros[indiceMAR].valor = registros[indiceMAR].valor | conseguirValidarDirFisica(registros[indiceLAR].valor, tablaSegmentos, cantBytes); 
+    }
+}
+
+//valida que el indice de la tabla en la dirección lógica sea menor a 8 y que la tabla tenga un valor válido en esa posición
+int indiceSegmentoEsValido(int indiceSegmento, int tablaSegmentos[]) {
+    if (indiceSegmento >= 0 && indiceSegmento < TAM_TABLA_SEGMENTOS && tablaSegmentos[indiceSegmento] > -1)
+        return 1;
+    else
+        terminarPrograma("se intentó acceder a un bloque de memoria inexistente");
+}
+
+//el nombre es bastante descripitivo
+int conseguirValidarDirFisica(int dirLogica, int tablaSegmentos[], int cantBytes) {
+    int offset = dirLogica & 0x0000FFFF,
+        dirBase,
+        limSegmento,
+        dirFisica,
+        limAcceso;
+    
+        //consigue la direccioó base y el límite del segmento
+        conseguirIntervaloSegmento(dirLogica, tablaSegmentos, &dirBase, &limSegmento);
+        //la dirección física es la dirección base más el offset indicado en la dirección lógica
+        dirFisica = dirBase + offset;
+        limAcceso = dirFisica + cantBytes;
+        if (dirBase <= dirFisica && limSegmento >= limAcceso)
+            return dirFisica;
+        else
+            terminarPrograma("fallo de segmento");
+}
