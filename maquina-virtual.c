@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
- #include <math.h>
+#include <string.h> 
 
 #define TAM_MEMORIA 16384
 #define TAM_REGISTROS 32 
 #define TAM_TABLA_SEGMENTOS 8
 #define CANT_BYTES_TAM_CODIGO 2
+#define MAX_CANT_BYTES_LEC_ESC 4
+#define CANT_BYTES_LEC_ESC 4
 
 typedef struct {
     char nombre[3];
@@ -20,6 +21,7 @@ void inicializarRegistros(registro registros[]);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], registro registros[]);
 int convertirArregloAInt(char arregloBytes[], int n);
+void convertirIntAArreglo(char arregloBytes[], int n, int valor);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
 void inicializarPunterosInicioSegmentos(int tablaSegmentos[], registro registros[]);
 
@@ -30,6 +32,17 @@ void conseguirIntervaloSegmento(int punteroASegmento, int tablaSegmentos[], int 
 int IPEstaEnSegmentoCodigo(int IP, int direccionBase, int limSegmento);
 void decodificarInstruccion(int instruccion, registro registros[]);
 void leerOperandosIncrementarIP(char memoria[], registro registros[], int direccionBase, int limiteSegmento);
+
+int registroEsValido(int nroRegistro);
+void prepararLAR(int operandoMemoria, registro registros[]);
+int cantBytesEsValida(int cantBytes);
+void prepararMAR(registro registros[], int tablaSegmentos[], int cantBytes);
+int indiceSegmentoEsValido(int indiceSegmento, int tablaSegmentos[]);
+int conseguirValidarDirFisica(int dirLogica, int tablaSegmentos[], int cantBytes);
+void leerMemoria(registro registros[], char memoria[]);
+int conseguirValorEnMemoria(int operandoMemoria, char memoria[], int tablaSegmentos[], registro registros[]) ;
+void escribirMemoria(registro registros[], char memoria[]);
+void ponerValorEnMemoria(int operandoMemoria, char memoria[], int tablaSegmentos[], registro registros[], int valor);
 
 int main(int argc, char *argv[]) {
 
@@ -72,6 +85,17 @@ int convertirArregloAInt(char arregloBytes[], int n) {
         cantBytesDesplazar--;
     }
     return num;
+}
+
+//esta función no la utiliza el bloque de inicialización pero tiene que ver con la de arriba
+void convertirIntAArreglo(char arregloBytes[], int n, int valor) {
+    int i = n - 1;
+    unsigned int aux = valor;
+
+    for (; i >= 0; i--) {
+        arregloBytes[i] = aux & 0x000000FF;
+        aux = aux >> 8;
+    }
 }
 
 //FUNCIONES PARA DEBUGGEAR------------------------------------------------------------------
@@ -174,6 +198,7 @@ void inicializarPunterosInicioSegmentos(int tablaSegmentos[], registro registros
     //inicialiar CS
     registros[indiceCS].valor = 0;
     //inicializar DS
+    registros[indiceDS].valor = 0;
     registros[indiceDS].valor = registros[indiceDS].valor | 0x00010000;
     //inicializar IP = CS
     registros[indiceIP].valor = registros[indiceCS].valor;
@@ -190,8 +215,11 @@ void ejecutarPrograma(char memoria[], registro registros[], int tablaSegmentos[]
 
     conseguirIntervaloSegmento(registros[indiceCS].valor, tablaSegmentos, &direccionBase, &limiteSegmento);
     while (IPEstaEnSegmentoCodigo(registros[indiceIP].valor, direccionBase, limiteSegmento)) {
-        decodificarInstruccion(memoria[registros[indiceIP].valor], registros);
-        leerOperandosIncrementarIP(memoria, registros, direccionBase, limiteSegmento);
+        // decodificarInstruccion(memoria[registros[indiceIP].valor], registros);
+        // leerOperandosIncrementarIP(memoria, registros, direccionBase, limiteSegmento);
+        ponerValorEnMemoria(0x031B000A, memoria, tablaSegmentos, registros, 90876);
+        //printf("memoria: %d\n", memoria[45]);
+        printf("memoria: %d\n", conseguirValorEnMemoria(0x031B000A, memoria, tablaSegmentos, registros));
         registros[indiceIP].valor = -1;
     }
 }
@@ -245,7 +273,7 @@ void leerOperandosIncrementarIP(char memoria[], registro registros[], int direcc
         indiceOP2 = conseguirIndiceReg("OP2", registros),
         indiceIP = conseguirIndiceReg("IP", registros),
         i, n;
-    char operandoBytes[4];
+    char operandoBytes[MAX_CANT_BYTES_LEC_ESC];
     
     //incremento IP para pararme en el byte que tengo que leer
     registros[indiceIP].valor++;
@@ -314,11 +342,11 @@ void prepararMAR(registro registros[], int tablaSegmentos[], int cantBytes) {
     if (cantBytesEsValida(cantBytes)) {
         indiceMAR = conseguirIndiceReg("MAR", registros),
         indiceLAR = conseguirIndiceReg("LAR", registros);
-
+        
         //pongo en los primeros 2 bytes del MAR la cantidad de bytes a leer/escribir
         registros[indiceMAR].valor = cantBytes << 16;
         //pongo en el resto la dirección física si es válida
-        registros[indiceMAR].valor = registros[indiceMAR].valor | conseguirValidarDirFisica(registros[indiceLAR].valor, tablaSegmentos, cantBytes); 
+        registros[indiceMAR].valor = registros[indiceMAR].valor | conseguirValidarDirFisica(registros[indiceLAR].valor, tablaSegmentos, cantBytes);
     }
 }
 
@@ -347,4 +375,66 @@ int conseguirValidarDirFisica(int dirLogica, int tablaSegmentos[], int cantBytes
             return dirFisica;
         else
             terminarPrograma("fallo de segmento");
+}
+
+//crea un arreglo que es una copia de la memoria pero de la porción indicada por MAR, luego ese arreglo lo convierte a int
+void leerMemoria(registro registros[], char memoria[]) {
+    int indiceMAR = conseguirIndiceReg("MAR", registros),
+        indiceMBR = conseguirIndiceReg("MBR", registros),
+        cantBytes = registros[indiceMAR].valor >> 16,
+        dirFisica = registros[indiceMAR].valor & 0x0000FFFF,
+        i, n, j;
+    char aux[MAX_CANT_BYTES_LEC_ESC];
+        
+    //variables para recorrer la memoria
+    i = dirFisica;
+    n = dirFisica + cantBytes;
+    //variable para copiar en el arreglo auxiliar
+    j = 0;
+    //copia de esa porción de memoria
+    for (; i < n; i++) {
+        aux[j] = memoria[i];
+        j++;
+    }
+    //pongo el valor en el MBR
+    registros[indiceMBR].valor = convertirArregloAInt(aux, cantBytes);
+}
+
+//setea los registros necesarios (LAR, MAR) y devuelve el valor del MBR
+int conseguirValorEnMemoria(int operandoMemoria, char memoria[], int tablaSegmentos[], registro registros[]) {
+    prepararLAR(operandoMemoria, registros);
+    prepararMAR(registros, tablaSegmentos, CANT_BYTES_LEC_ESC);
+    leerMemoria(registros, memoria);
+    return registros[conseguirIndiceReg("MBR", registros)].valor;
+}
+
+//pasa a un arreglo char el valor en MBR y lo copia a la memoria en el lugar indicado por MAR
+void escribirMemoria(registro registros[], char memoria[]) {
+    int indiceMAR = conseguirIndiceReg("MAR", registros),
+        indiceMBR = conseguirIndiceReg("MBR", registros),
+        cantBytes = (registros[indiceMAR].valor >> 16) & 0x0000FFFF,
+        dirFisica = registros[indiceMAR].valor & 0x0000FFFF,
+        i, n, j;
+    char aux[MAX_CANT_BYTES_LEC_ESC];
+
+    //variables para recorrer la memoria
+    i = dirFisica;
+    n = dirFisica + cantBytes;
+    //variable para copiar en el arreglo auxiliar
+    j = 0;
+    //convierte el valor en el MBR en un arreglo char
+    convertirIntAArreglo(aux, cantBytes, registros[indiceMBR].valor);
+    //copiar arreglo a la memoria
+    for (; i < n; i++) {
+        memoria[i] = aux[j];
+        j++;
+    }
+}
+
+//setea los registros necesarios (LAR, MAR) y pone en memoria el valor en MBR
+void ponerValorEnMemoria(int operandoMemoria, char memoria[], int tablaSegmentos[], registro registros[], int valor) {
+    prepararLAR(operandoMemoria, registros);
+    prepararMAR(registros, tablaSegmentos, CANT_BYTES_LEC_ESC);
+    registros[conseguirIndiceReg("MBR", registros)].valor = valor;
+    escribirMemoria(registros, memoria);
 }
