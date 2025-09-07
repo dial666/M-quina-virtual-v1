@@ -153,7 +153,13 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos
 }
 
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]) {
-    int aux = 0;
+    int aux = 0,
+        i;
+
+    //para validar los accesos a la tabla de segmentos, es necesario inic. los valores de las 8 entradas
+    for (i = 0; i< TAM_TABLA_SEGMENTOS; i++)
+        tablaSegmentos[i] = -1;
+
     aux = aux | tamanoCodigo;
     tablaSegmentos[0] = aux;
     aux = aux << 16;
