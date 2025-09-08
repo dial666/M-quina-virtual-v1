@@ -4,7 +4,7 @@
 
 #define TAM_MEMORIA 16384
 #define TAM_REGISTROS 32 
-#define TAM_TABLA_SEGMENTOS 8
+#define TAM_TABLA_SEGMENTOS 2
 #define CANT_BYTES_TAM_CODIGO 2
 
 #define CS_INDEX 26
@@ -29,6 +29,7 @@ typedef void (*ArrayOperaciones[32])(char[], int[], int[]);
 void terminarPrograma(char mensaje[]);
 int verificarNumOperacion(char primer_byte);
 void mostrarArreglo(char arr[], int n);
+void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]);
 void convertirArregloAInt(char arregloBytes[], int n, int *num);
@@ -105,7 +106,7 @@ int main(int argc, char *argv[]) {
     operaciones[0x1E] = &mv_ldh;
     operaciones[0x1F] = &mv_rnd;
 
-    leerArchivoEntrada("C:/Users/Matu/Desktop/Facultad/2025/Arqui/MV/Repo/M-quina-virtual-v1/prueba.vmx", memoria, tablasegmentos, registros);
+    leerArchivoEntrada(argv[1], memoria, tablasegmentos, registros);
     //ejecutarPrograma(memoria, registros, tablasegmentos);
     ejecutarPrograma(memoria, registros, tablasegmentos, operaciones);
 
@@ -156,12 +157,18 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos
 }
 
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]) {
-    int aux = 0;
+    int aux = 0,
+        i;
+
+    //para validar los accesos a la tabla de segmentos, es necesario inic. los valores de las 8 entradas
+    for (i = 0; i< TAM_TABLA_SEGMENTOS; i++)
+        tablaSegmentos[i] = -1;
+
     aux = aux | tamanoCodigo;
-    tablaSegmentos[CS_SEG_INDEX] = aux;
+    tablaSegmentos[0] = aux;
     aux = aux << 16;
     aux = aux | (TAM_MEMORIA - tamanoCodigo);
-    tablaSegmentos[DS_SEG_INDEX] = aux;
+    tablaSegmentos[1] = aux;
 }
 
 void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]) {
@@ -174,7 +181,7 @@ void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]) {
     registros[IP_INDEX] = registros[CS_INDEX];
 
     //de prueba:
-    registros[7] = 0x00010000;
+    //registros[7] = 0x00010000;
 }
 
 void intercambiarVar(int * a, int * b){
@@ -192,18 +199,23 @@ void cargarLAR(int dirLogica, int registros[]){
     registros[LAR_INDEX] = dirLogica;
 }
 
+//valida que el indice de la tabla en la dirección lógica sea menor a 8 y que la tabla tenga un valor válido en esa posición
+void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]) {
+    if (!(indiceSegmento >= 0 && indiceSegmento < TAM_TABLA_SEGMENTOS && tablaSegmentos[indiceSegmento] > -1))
+        terminarPrograma("se intentó acceder a un bloque de memoria inexistente");
+}
+
 void cargarMAR(int cantBytes, int registros[], int tablaSegmentos[]){
-    //printf("cantBytes: %X MAR1: %X\n",cantBytes, registros[MAR_INDEX]);
     int dirLogica = registros[LAR_INDEX];
-    //printf("LAR1: %X\n",registros[LAR_INDEX]);
     int offset = dirLogica & 0x0000FFFF;
     int segmentIndex = dirLogica >> 16;
+
+    verificarIndiceSegmento(segmentIndex, tablaSegmentos);
 
     int dirBase = tablaSegmentos[segmentIndex] >> 16;
     int tamanioSegmento = tablaSegmentos[segmentIndex] & 0x0000FFFF;
 
     int dirFisica = dirBase + offset;
-    //printf("dirFisica: %X\n",dirFisica);
 
     if( (dirBase <= dirFisica) && ( (dirBase + tamanioSegmento) >= (dirFisica + cantBytes) ) ){
         registros[MAR_INDEX] = (cantBytes << 16) | ((dirFisica) & (0x0000FFFF)); //CREO QUE EL ULTIMO & ESTA DE MAS PERO REVISAR
@@ -356,7 +368,7 @@ void store(char memoria[], int registros[], int tablaSegmentos[], int dirLogica,
     escribirMemoria(memoria, registros, tablaSegmentos);
 }
 
-void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos[], int operando, int valor){
+void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos[], int operando, int valor){ //no se puede llamar con operando de tipo inmediato
     int tipo = (operando >> 24) & (0x00000003);
     int valor_logico = (operando << 8) >> 8;
 
@@ -368,6 +380,9 @@ void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos
         int registro = (valor_logico >> 16) & 0x1F;
         int offset = (valor_logico << 16) >> 16;
 
+        int offsetRegistro = registro & 0xFFFF;
+        if (offset + offsetRegistro > 0xFFFF)
+            terminarPrograma("segmentation fault: offset supera rango permitido");
 
         int dirLogica = registros[registro] + offset;
         
@@ -403,6 +418,10 @@ void mv_add(char memoria[], int registros[], int tablaSegmentos[]){
     //printf("A:%d, B:%d, A+B:%d\n", A, B, A+B);
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A+B);
     actualizarCC(registros, A+B);
+
+    //pruebas
+    printf("A:%d, B:%d, A+B:%d\n", A, B, A+B);
+    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
 }
 void mv_sub(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
@@ -529,17 +548,17 @@ void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], Arr
     //ciclo de fetch-decode-execute
     //prueba
     //printf("llega a ejecutar\n");
-    memoria[7] = 2;
+   /*  memoria[7] = 2;
     memoria[8] = 0xFF;
-    memoria[9] = 0xFD;
+    memoria[9] = 0xFD; */
 
 
     //ciclo real
     while(registros[IP_INDEX] != -1){
         fetchInstruccion(memoria, registros, tablaSegmentos);
-        printf("fetched\n");
+        //printf("fetched\n");
         decodeInstruccion(memoria, registros, tablaSegmentos);
-        printf("decoded\n");
+        //printf("decoded\n");
         printf("%02X\n", registros[OPC_INDEX]);
         operaciones[registros[OPC_INDEX]](memoria, registros, tablaSegmentos);
     }
