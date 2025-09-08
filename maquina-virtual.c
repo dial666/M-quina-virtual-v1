@@ -35,6 +35,7 @@ void convertirArregloAInt(char arregloBytes[], int n, int *num);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
 void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]);
 void fetch(char memoria[], int registros[], int tablaSegmentos[], int dirLogica, int cantBytes);
+void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones);
 
 void mv_mov(char memoria[], int registros[], int tablaSegmentos[]);
 void mv_add(char memoria[], int registros[], int tablaSegmentos[]);
@@ -104,7 +105,7 @@ int main(int argc, char *argv[]) {
     operaciones[0x1E] = &mv_ldh;
     operaciones[0x1F] = &mv_rnd;
 
-    leerArchivoEntrada("C:/Users/Matu/Desktop/Facultad/2025/Arqui/MV/Repo/M-quina-virtual-v1/prueba3.vmx", memoria, tablasegmentos, registros);
+    leerArchivoEntrada("C:/Users/Matu/Desktop/Facultad/2025/Arqui/MV/Repo/M-quina-virtual-v1/prueba.vmx", memoria, tablasegmentos, registros);
     //ejecutarPrograma(memoria, registros, tablasegmentos);
     ejecutarPrograma(memoria, registros, tablasegmentos, operaciones);
 
@@ -192,9 +193,9 @@ void cargarLAR(int dirLogica, int registros[]){
 }
 
 void cargarMAR(int cantBytes, int registros[], int tablaSegmentos[]){
-    printf("cantBytes: %X MAR1: %X\n",cantBytes, registros[MAR_INDEX]);
+    //printf("cantBytes: %X MAR1: %X\n",cantBytes, registros[MAR_INDEX]);
     int dirLogica = registros[LAR_INDEX];
-    printf("LAR1: %X\n",registros[LAR_INDEX]);
+    //printf("LAR1: %X\n",registros[LAR_INDEX]);
     int offset = dirLogica & 0x0000FFFF;
     int segmentIndex = dirLogica >> 16;
 
@@ -202,11 +203,11 @@ void cargarMAR(int cantBytes, int registros[], int tablaSegmentos[]){
     int tamanioSegmento = tablaSegmentos[segmentIndex] & 0x0000FFFF;
 
     int dirFisica = dirBase + offset;
-    printf("dirFisica: %X\n",dirFisica);
+    //printf("dirFisica: %X\n",dirFisica);
 
     if( (dirBase <= dirFisica) && ( (dirBase + tamanioSegmento) >= (dirFisica + cantBytes) ) ){
         registros[MAR_INDEX] = (cantBytes << 16) | ((dirFisica) & (0x0000FFFF)); //CREO QUE EL ULTIMO & ESTA DE MAS PERO REVISAR
-        printf("cantBytes: %X MAR2: %X\n",cantBytes, registros[MAR_INDEX]);
+        //printf("cantBytes: %X MAR2: %X\n",cantBytes, registros[MAR_INDEX]);
     }
     else
         terminarPrograma("segmentation fault");
@@ -217,18 +218,18 @@ void leerMemoria(char memoria[], int registros[]){
     
     int cantBytes = registros[MAR_INDEX] >> 16;
     int direccion = registros[MAR_INDEX] & 0x00FF;
-    printf("MAR: %X memoria[%d]: %X\n", registros[MAR_INDEX], direccion, memoria[direccion]);
+    //printf("MAR: %X memoria[%d]: %X\n", registros[MAR_INDEX], direccion, memoria[direccion]);
 
     int valor = 0;
     for(int i = 0; i < cantBytes; i++){
         valor = (valor << 8) | (memoria[direccion + i] & 0x000000FF);  // no mantiene signo de valor leido
-        printf("valor %X i: %d\n", valor, i);
+        //printf("valor %X i: %d\n", valor, i);
     }
 
     valor = valor << (32 - 8*cantBytes);  //restora signo
     valor = valor >> (32 - 8*cantBytes);
     registros[MBR_INDEX] = valor;
-    printf("MBR dsp: %X\n", registros[MBR_INDEX]);
+    //printf("MBR dsp: %X\n", registros[MBR_INDEX]);
     
 }
 
@@ -245,12 +246,12 @@ void fetch(char memoria[], int registros[], int tablaSegmentos[], int dirLogica,
 
 void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[]){ //IP todavia apunta a inicio de instruccion
     int instruccion = registros[MBR_INDEX];
-    printf("MBR: %X\n", registros[MBR_INDEX]);
+    //printf("MBR: %X\n", registros[MBR_INDEX]);
     int tipo1 = (instruccion >> 6) /*(y como es SAR:)*/ & 0b11;
     int tipo2 = (instruccion >> 4) & 0b11;
 
     registros[OPC_INDEX] = instruccion & 0b00011111;
-    printf("OPC: %X tipo1: %X tipo2: %X\n", registros[OPC_INDEX], tipo1, tipo2);
+    //printf("OPC: %X tipo1: %X tipo2: %X\n", registros[OPC_INDEX], tipo1, tipo2);
 
     fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX] + 1, tipo1); //fetch op1 (o B)
     registros[OP1_INDEX] = registros[MBR_INDEX]; //depende de que leerMemoria escriba 0 en el MBR si el tipo1 es 0 (instruccion sin operandos)
@@ -273,35 +274,15 @@ void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[]){ /
     if(tipo2!=0)
         intercambiarVar(&registros[OP1_INDEX], &registros[OP2_INDEX]);
 
-    printf("OP1: %X ", registros[OP1_INDEX]);
-    printf("OP2: %X ", registros[OP2_INDEX]);
+    //printf("OP1: %X ", registros[OP1_INDEX]);
+    //printf("OP2: %X ", registros[OP2_INDEX]);
 
-    printf("IP: %d ", registros[IP_INDEX]);
+    //printf("IP: %d ", registros[IP_INDEX]);
     registros[IP_INDEX] += 1 + tipo1 + tipo2;    
-    printf("IP: %d \n", registros[IP_INDEX]);
+    //printf("IP: %d \n", registros[IP_INDEX]);
     //leerOpA(memoria, registros, tablaSegmentos, instruccion >> 6);
 
 
-}
-
-void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones) {
-    //ciclo de fetch-decode-execute
-    //prueba
-    printf("llega a ejecutar\n");
-    memoria[7] = 2;
-    memoria[8] = 0x00;
-    memoria[9] = 0x03;
-
-
-    //ciclo real
-    while(registros[IP_INDEX] != -1){
-        fetchInstruccion(memoria, registros, tablaSegmentos);
-        printf("fetched\n");
-        decodeInstruccion(memoria, registros, tablaSegmentos);
-        printf("decoded\n");
-        printf("%X\n", registros[OPC_INDEX]);
-        operaciones[registros[OPC_INDEX]](memoria, registros, tablaSegmentos);
-    }
 }
 
 void terminarPrograma(char mensaje[]) {
@@ -332,7 +313,7 @@ void mostrarArreglo(char arr[], int n) {
 int OperandotoInmediato(int operando, char memoria[], int registros[], int tablaSegmentos[]){
     int tipo = (operando >> 24) & (0x00000003);
     int valor = (operando << 8) >> 8;
-    printf("tipo: %X valor:%X\n", tipo, valor);
+    ////printf("tipo: %X valor:%X\n", tipo, valor);
     if(tipo == 2)
         return valor;
     else if (tipo == 01)
@@ -340,7 +321,7 @@ int OperandotoInmediato(int operando, char memoria[], int registros[], int tabla
     else if(tipo == 3){
         int registro = (valor >> 16) & 0x1F;
         int offset = (valor << 16) >> 16;
-        printf("registro: %X offset:%X\n", registro, offset);
+        ////printf("registro: %X offset:%X\n", registro, offset);
         int dirLogica = registros[registro] + offset;
         fetch(memoria, registros, tablaSegmentos, dirLogica, 2);
         return registros[MBR_INDEX];
@@ -360,7 +341,7 @@ void escribirMemoria(char memoria[], int registros[], int tablaSegmentos[]){
 
     int valor = registros[MBR_INDEX];
 
-    printf("cantBytes: %X direccion:%X valor:%X\n", cantBytes, direccion, valor);
+    //printf("cantBytes: %X direccion:%X valor:%X\n", cantBytes, direccion, valor);
     for(int i = 1; i <= cantBytes; i++)
         memoria[direccion + cantBytes - i] = (valor << (32-i*8)) >> 24; //shiftea el byte que quiero escribir hasta el byte mas significativo y luego lo shiftea hasta el byte menos significativo
         //creo que el char trunca y toma el byte menos significativo del int, asi que tambien podria ser:
@@ -379,8 +360,8 @@ void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos
     int tipo = (operando >> 24) & (0x00000003);
     int valor_logico = (operando << 8) >> 8;
 
-    printf("ESCRIBIR MEMORIA, operando:%X\n", operando);
-    printf("tipo: %X valor_logico:%X\n", tipo, valor_logico);
+    //printf("ESCRIBIR MEMORIA, operando:%X\n", operando);
+    //printf("tipo: %X valor_logico:%X\n", tipo, valor_logico);
     if (tipo == 1)
         registros[valor_logico] = valor; //no contempla registro inexistente
     else if(tipo == 3){
@@ -399,12 +380,13 @@ void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos
 }
 
 void actualizarCC(int registros[], int valor){ //primer bit N, segundo Z
+    registros[CC_INDEX] &= 0x3FFFFFFF; //setea en 0 primeros dos bits pero deja el resto con el valor que tuvieran
     if(valor == 0)
-        registros[CC_INDEX] &= 0x4FFFFFFF;
+        registros[CC_INDEX] |= 0x40000000; //01xxx...
     else if (valor < 0)
-        registros[CC_INDEX] &= 0x8FFFFFFF;
+        registros[CC_INDEX] |= 0x80000000; //10xxx...
     else
-        registros[CC_INDEX] &= 0x0FFFFFFF;
+        registros[CC_INDEX] |= 0x00000000; //innecesario pero agrega claridad
 }
 
 void actualizarAC(int registros[], int valor){
@@ -418,7 +400,7 @@ void mv_mov(char memoria[], int registros[], int tablaSegmentos[]){
 void mv_add(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
-    printf("A:%d, B:%d, A+B:%d\n", A, B, A+B);
+    //printf("A:%d, B:%d, A+B:%d\n", A, B, A+B);
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A+B);
     actualizarCC(registros, A+B);
 }
@@ -427,26 +409,57 @@ void mv_sub(char memoria[], int registros[], int tablaSegmentos[]){
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A-B);
     actualizarCC(registros, A-B);
+
+    /* //pruebas:
+    printf("A:%d, B:%d, A-B:%d\n", A, B, A-B);
+    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos)); */    
 }
 void mv_mul(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A*B);
     actualizarCC(registros, A*B);
+
+    /* //pruebas:
+    printf("A:%d, B:%d, A*B:%d\n", A, B, A*B);
+    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
+    
+    printf("CC: 0x%08X, AC:0x%08X\n", registros[CC_INDEX], registros[AC_INDEX]); */
 }
 void mv_div(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
-    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A*B);
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A/B);
     actualizarCC(registros, A/B);
     actualizarAC(registros, A%B);
+
+    /* //pruebas:
+    printf("A:%d, B:%d, A/B:%d\n", A, B, A/B);
+    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
+
+    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); */
 }
 void mv_cmp(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
     actualizarCC(registros, A-B);
+
+    /* printf("A:%d, B:%d, A-B:%d\n", A, B, A-B);
+    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
+
+    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); */
 }
 void mv_shl(char memoria[], int registros[], int tablaSegmentos[]){
+    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
+    
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A<<B);
+    actualizarCC(registros, A<<B);
+
+    /* printf("A:0x%08X, B:%d, A<<B:0x%08X\n", A, B, A<<B);
+    printf("Operando: 0x%X, valor:0x%08X\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
+
+    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); */
 
 }
 void mv_shr(char memoria[], int registros[], int tablaSegmentos[]){
@@ -511,3 +524,23 @@ void mv_stop(char memoria[], int registros[], int tablaSegmentos[]){
 void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
     
 };
+
+void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones) {
+    //ciclo de fetch-decode-execute
+    //prueba
+    //printf("llega a ejecutar\n");
+    memoria[7] = 2;
+    memoria[8] = 0xFF;
+    memoria[9] = 0xFD;
+
+
+    //ciclo real
+    while(registros[IP_INDEX] != -1){
+        fetchInstruccion(memoria, registros, tablaSegmentos);
+        printf("fetched\n");
+        decodeInstruccion(memoria, registros, tablaSegmentos);
+        printf("decoded\n");
+        printf("%02X\n", registros[OPC_INDEX]);
+        operaciones[registros[OPC_INDEX]](memoria, registros, tablaSegmentos);
+    }
+}
