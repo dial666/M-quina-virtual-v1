@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #define TAM_MEMORIA 16384
@@ -21,6 +22,13 @@
 #define OPC_INDEX 4
 #define OP1_INDEX 5
 #define OP2_INDEX 6 
+
+#define EAX_INDEX 10
+#define EBX_INDEX 11
+#define ECX_INDEX 12
+#define EDX_INDEX 13
+#define EEX_INDEX 14
+#define EFX_INDEX 15
 
 #define AC_INDEX 16
 #define CC_INDEX 17
@@ -628,16 +636,51 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
     
 }
 
+int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 bits
+
+}
+
+char* inmediatoToString(int inmediato, int formato){//lo
+
+}
+
 void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
     int formato = registros[EAX_INDEX];
-    int cantCeldas = registro[ECX_INDEX] & 0xFFFF;
-    int tamanioCelda = (registro[ECX_INDEX]>>16) & 0xFFFF;
-    int dirLogica = registro[EDX_INDEX];
+    int cantCeldas = registros[ECX_INDEX] & 0xFFFF;
+    int tamanioCelda = (registros[ECX_INDEX]>>16) & 0xFFFF;
+    int dirLogica = registros[EDX_INDEX];                     
     
     int modo = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     
-    if(tamanioCeldas < 1 || tamanioCeldas > 4)
+    if(tamanioCelda < 1 || tamanioCelda > 4)  //solo puede escribir celdas de 1 a 4 bytes (MBR es de 32 bits)
         terminarPrograma("tamanio de celda invalido");
+    if(modo == 1){ //READ (escribe en memoria lo leido en consola)
+        char* cadenaConsola;
+        for(int i = 0; i < cantCeldas; i++){
+            if((dirLogica >> 16)!=DS_INDEX)  //controlamos que este en el DS
+                terminarPrograma("segmentatio fault, no puede escribir o leer datos fuera del DS");
+            cargarLAR(dirLogica, registros);                                   
+            cargarMAR(tamanioCelda, registros, tablaSegmentos);
+            printf("[%X]: ", registros[MAR_INDEX]);
+            scanf("%s", cadenaConsola);
+            registros[MBR_INDEX] = cadenaToInmediato(cadenaConsola, formato);
+            escribirMemoria(memoria, registros, tablaSegmentos);
+            dirLogica+=tamanioCelda;
+        }
+
+    }else if (modo == 2){ // WRITE (escribe en consola)
+        for(int i = 0; i < cantCeldas; i++){
+            if((dirLogica >> 16)!=DS_INDEX)  //controlamos que este en el DS
+                terminarPrograma("segmentatio fault, no puede escribir o leer datos fuera del DS");
+            cargarLAR(dirLogica, registros);                                   
+            cargarMAR(tamanioCelda, registros, tablaSegmentos);
+            printf("[%X]: ", registros[MAR_INDEX]);
+            leerMemoria(memoria, registros);
+            printf("%s\n", inmediatoToString(registros[MBR_INDEX], formato));
+            dirLogica+=tamanioCelda;
+        }
+    }else
+        terminarPrograma("operando invalido para instruccion sys");
     
 }
 void mv_jmp(char memoria[], int registros[], int tablaSegmentos[]){
