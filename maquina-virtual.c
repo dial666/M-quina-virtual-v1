@@ -637,8 +637,24 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
 }
 
 int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 bits 
-    //PRECONDICION: el string debe tener entre 1 y 4 caracteres
-    
+    //PRECONDICION: el string debe tener significar un inmediato de menos de 4 bytes
+    int inmediato=0;
+    for(int i=0; cadena[i]!='\0'; i++){
+        switch(formato){
+            case 0x1: //decimal
+                break;
+            case 0x2: //caracteres
+                break;
+            case 0x4: //octal
+                break;
+            case 0x8: //hexadecimal
+                break;
+            case 0x10: //binario
+                break;
+            default:
+                terminarPrograma("formato de escritura a memoria erroneo");
+        }
+    }
 
 }
 
