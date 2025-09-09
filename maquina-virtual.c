@@ -470,10 +470,10 @@ void mv_cmp(char memoria[], int registros[], int tablaSegmentos[]){
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
     actualizarCC(registros, A-B);
 
-    /* printf("A:%d, B:%d, A-B:%d\n", A, B, A-B);
+  /*   printf("A:%d, B:%d, A-B:%d\n", A, B, A-B);
     printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
 
-    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); */
+    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]);  */
 }
 void mv_shl(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
@@ -588,33 +588,44 @@ void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){//genera solo
     
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], aleatorio);
 
-    printf("B:%d, A RAND B:0x%08X\n", B, aleatorio);
+    /* printf("B:%d, A RAND B:0x%08X\n", B, aleatorio);
     printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
 
-    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); 
+    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]);  */
 }
 
 void jump(char memoria[], int registros[], int tablaSegmentos[], int operando){
     int nuevoIP = OperandotoInmediato(operando, memoria, registros, tablaSegmentos);
 
-    if(nuevoIP > 0xFFFF) // offset de la instruccion desde el DS es demasiado grande e invadira el indice de la tabla de segmentos
+    if(nuevoIP > 0xFFFF) // offset de la instruccion desde el CS es demasiado grande e invadira el indice de la tabla de segmentos
         terminarPrograma("offset de instruccion demasiado grande");
     if(tipoOperando(operando) == 2)
-        nuevoIP += registros[DS_INDEX]; //esto suma el indice del DS en la tabla de segmentos resultando en (para DS indice 1 en tabla):
-                                        // 00 01 nuevoIP, e.g., para ir a instruccion 9: 00 01 00 09
+        nuevoIP += registros[CS_INDEX]; //esto suma el indice del CS en la tabla de segmentos resultando en (para CS indice 0 en tabla):
+                                        // 00 00 nuevoIP, e.g., para ir a instruccion 9: 00 00 00 09
     registros[IP_INDEX] = nuevoIP;
 
+    /* printf("nuevoIP: 0x%08X\n", registros[IP_INDEX]);
+    printf("Operando: 0x%X, valor:0x%08X\n", operando, OperandotoInmediato(operando, memoria, registros, tablaSegmentos));
+
+    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); */
 }
 
 int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, int n, int z){
     int cc = registros[CC_INDEX];
     int cc_n = (cc >> 31) & 0b01;
-    int cc_z = (cc >> 30) & 0b10;
+    int cc_z = (cc >> 30) & 0b01;
+
+    /* printf("cc_n: %d cc_z: %d\n", cc_n, cc_z);
+    printf("Operando: 0x%X, valor:0x%08X\n", operando, OperandotoInmediato(operando, memoria, registros, tablaSegmentos));
+
+    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); */
 
     if((cc_n == n) && (cc_z == z))
         jump(memoria, registros, tablaSegmentos, operando);
     else
         return 1;
+
+    
 }
 
 void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
@@ -679,7 +690,7 @@ void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], Arr
         //printf("fetched\n");
         decodeInstruccion(memoria, registros, tablaSegmentos);
         //printf("decoded\n");
-        printf("%02X\n", registros[OPC_INDEX]);
+        //printf("%02X\n", registros[OPC_INDEX]);
         operaciones[registros[OPC_INDEX]](memoria, registros, tablaSegmentos);
     }
 }
