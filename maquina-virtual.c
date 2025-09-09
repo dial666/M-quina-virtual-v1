@@ -623,7 +623,7 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
     if((cc_n == n) && (cc_z == z))
         jump(memoria, registros, tablaSegmentos, operando);
     else
-        return 1;
+        return 0;
 
     
 }
