@@ -629,6 +629,15 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
 }
 
 void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
+    int formato = registros[EAX_INDEX];
+    int cantCeldas = registro[ECX_INDEX] & 0xFFFF;
+    int tamanioCelda = (registro[ECX_INDEX]>>16) & 0xFFFF;
+    int dirLogica = registro[EDX_INDEX];
+    
+    int modo = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    
+    if(tamanioCeldas < 1 || tamanioCeldas > 4)
+        terminarPrograma("tamanio de celda invalido");
     
 }
 void mv_jmp(char memoria[], int registros[], int tablaSegmentos[]){
