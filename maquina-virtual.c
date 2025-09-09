@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define TAM_MEMORIA 16384
 #define TAM_REGISTROS 32 
@@ -31,6 +32,7 @@ int verificarNumOperacion(char primer_byte);
 void mostrarArreglo(char arr[], int n);
 void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]);
 int mascara0primerosBits(int cantBits);
+int tipoOperando(int operando);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]);
 void convertirArregloAInt(char arregloBytes[], int n, int *num);
@@ -324,7 +326,7 @@ void mostrarArreglo(char arr[], int n) {
 }
 
 int OperandotoInmediato(int operando, char memoria[], int registros[], int tablaSegmentos[]){
-    int tipo = (operando >> 24) & (0x00000003);
+    int tipo = tipoOperando(operando);
     int valor = (operando << 8) >> 8;
     ////printf("tipo: %X valor:%X\n", tipo, valor);
     if(tipo == 2)
@@ -517,25 +519,79 @@ void mv_sar(char memoria[], int registros[], int tablaSegmentos[]){
     
 }
 void mv_and(char memoria[], int registros[], int tablaSegmentos[]){
+    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
     
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A&B);
+    actualizarCC(registros, A&B);
 }
 void mv_or(char memoria[], int registros[], int tablaSegmentos[]){
+    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
     
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A|B);
+    actualizarCC(registros, A|B);
 }
 void mv_xor(char memoria[], int registros[], int tablaSegmentos[]){
+    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
     
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A^B);
+    actualizarCC(registros, A^B);
 }
+
 void mv_swap(char memoria[], int registros[], int tablaSegmentos[]){
-    
+
+    int operando1 = registros[OP1_INDEX]; //los guardo primero por si las variables se apuntan entre si
+    int operando2 = registros[OP2_INDEX];
+
+    int tipo1 = tipoOperando(operando1);
+    int tipo2 = tipoOperando(operando2);
+
+    if((tipo1 == 2) || (tipo2 == 2))
+        terminarPrograma("error: inmediato como operando de operacion swap");
+    else{
+
+        int A = OperandotoInmediato(operando1, memoria, registros, tablaSegmentos);
+        int B = OperandotoInmediato(operando2, memoria, registros, tablaSegmentos);
+        
+        escribirMemoriaRegistro(memoria, registros, tablaSegmentos, operando1, B);
+        escribirMemoriaRegistro(memoria, registros, tablaSegmentos, operando2, A);
+    }
 }
-void mv_ldl(char memoria[], int registros[], int tablaSegmentos[]){
+void mv_ldl(char memoria[], int registros[], int tablaSegmentos[]){//precondicion: A tiene un tamaño de 32 bits
+    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
+
+    B &= 0xFFFF; //me quedo solo con los 2 bytes menos significativos
+    B = B<<16;
+    A &= 0xFFFF; //seteo primeros 2 bytes en 0 y me quedo con los 2 bytes menos significativos
+    A = A|B;
     
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A);
 }
 void mv_ldh(char memoria[], int registros[], int tablaSegmentos[]){
+    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
+
+    B &= 0xFFFF; //me quedo solo con los 2 bytes menos significativos
+    A &= 0xFFFF0000; //seteo ultimos 2 bytes en 0 y me quedo con los 2 bytes mas significativos
+    A = A|B;
     
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A);
 }
-void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){
+void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){//genera solo enteros
+    srand(time(NULL)); //setea la seed de random con el tiempo para emular aleatoriedad
+    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
+
+    int aleatorio = (rand() % (B - 0 + 1)) + 0; //el formato es rd_num= (rd_num % (max- min + 1)) + min
     
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], aleatorio);
+
+    printf("B:%d, A RAND B:0x%08X\n", B, aleatorio);
+    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
+
+    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); 
 }
 void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
     
@@ -575,6 +631,10 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
 
 int mascara0primerosBits(int cantBits){
     return cantBits < 32 ? (1U << (32 - cantBits)) - 1 : 0;
+}
+
+int tipoOperando(int operando){
+    return (operando >> 24) & (0x00000003);
 }
 
 void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones) {
