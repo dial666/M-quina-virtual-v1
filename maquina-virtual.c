@@ -584,7 +584,7 @@ void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){//genera solo
     srand(time(NULL)); //setea la seed de random con el tiempo para emular aleatoriedad
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
 
-    int aleatorio = (rand() % (B - 0 + 1)) + 0; //el formato es rd_num= (rd_num % (max- min + 1)) + min
+    int aleatorio = (rand() % (B - 0 + 1)) + 0; //el formato es rd_num= (rd_num % (max - min + 1)) + min
     
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], aleatorio);
 
@@ -593,29 +593,56 @@ void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){//genera solo
 
     printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); 
 }
+
+void jump(char memoria[], int registros[], int tablaSegmentos[], int operando){
+    int nuevoIP = OperandotoInmediato(operando, memoria, registros, tablaSegmentos);
+
+    if(nuevoIP > 0xFFFF) // offset de la instruccion desde el DS es demasiado grande e invadira el indice de la tabla de segmentos
+        terminarPrograma("offset de instruccion demasiado grande");
+    if(tipoOperando(operando) == 2)
+        nuevoIP += registros[DS_INDEX]; //esto suma el indice del DS en la tabla de segmentos resultando en (para DS indice 1 en tabla):
+                                        // 00 01 nuevoIP, e.g., para ir a instruccion 9: 00 01 00 09
+    registros[IP_INDEX] = nuevoIP;
+
+}
+
+int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, int n, int z){
+    int cc = registros[CC_INDEX];
+    int cc_n = (cc >> 31) & 0b01;
+    int cc_z = (cc >> 30) & 0b10;
+
+    if((cc_n == n) && (cc_z == z))
+        jump(memoria, registros, tablaSegmentos, operando);
+    else
+        return 1;
+}
+
 void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
     
 }
 void mv_jmp(char memoria[], int registros[], int tablaSegmentos[]){
-    
+    jump(memoria, registros, tablaSegmentos, registros[OP1_INDEX]);
 }
 void mv_jz(char memoria[], int registros[], int tablaSegmentos[]){
-    
+    jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 0, 1);
 }
 void mv_jp(char memoria[], int registros[], int tablaSegmentos[]){
-    
+    jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 0, 0);
 }
 void mv_jn(char memoria[], int registros[], int tablaSegmentos[]){
-    
+    jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 1, 0);
 }
 void mv_jnz(char memoria[], int registros[], int tablaSegmentos[]){
-    
+    jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 1, 0)
+    || jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 0, 0);
 }
 void mv_jnp(char memoria[], int registros[], int tablaSegmentos[]){
-    
+    jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 1, 0)
+    || jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 0, 1);
 }
 void mv_jnn(char memoria[], int registros[], int tablaSegmentos[]){
-    
+    jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 0, 1)
+    || jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 0, 0);
 }
 void mv_not(char memoria[], int registros[], int tablaSegmentos[]){
     
@@ -626,7 +653,7 @@ void mv_stop(char memoria[], int registros[], int tablaSegmentos[]){
 
 }
 void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
-    
+    terminarPrograma("codigo de operacion invalido");
 };
 
 int mascara0primerosBits(int cantBits){
