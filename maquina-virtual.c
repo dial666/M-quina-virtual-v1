@@ -636,12 +636,14 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
     
 }
 
-int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 bits
+int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 bits 
+    //PRECONDICION: el string debe tener entre 1 y 4 caracteres
+    
 
 }
 
-char* inmediatoToString(int inmediato, int formato){//lo
-
+char* inmediatoToString(int inmediato, int formato){//
+    
 }
 
 void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
@@ -702,7 +704,10 @@ void mv_jnn(char memoria[], int registros[], int tablaSegmentos[]){
     || jumpif(memoria, registros, tablaSegmentos, registros[OP1_INDEX], 0, 0);
 }
 void mv_not(char memoria[], int registros[], int tablaSegmentos[]){
+    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], ~A);
+    actualizarCC(registros, ~A);
 }
 void mv_stop(char memoria[], int registros[], int tablaSegmentos[]){
     printf("fin\n");
