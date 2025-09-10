@@ -615,16 +615,24 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
     
 }
 
+int minimo(int a, int b){
+    if (a>b)
+        return b;
+    else 
+        return a;
+}
+
+
 int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 bits 
     //PRECONDICION: el string debe significar un inmediato de igual o menos que 4 bytes
     int inmediato=0;
-    int largo = strlen(cadena);
+    int largo = minimo(strlen(cadena), 4);
     switch(formato){
         case 0x1: //decimal
             return (int) strtol(cadena, NULL, 10);
             break;
         case 0x2: //caracteres
-            for (int i=largo-1; i>=0; i--)
+            for (int i=0; i<largo; i++)
                 inmediato = (inmediato << 8) | cadena[i];
             return inmediato;
             break;
