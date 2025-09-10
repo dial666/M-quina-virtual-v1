@@ -567,7 +567,7 @@ void mv_swap(char memoria[], int registros[], int tablaSegmentos[]){
         escribirMemoriaRegistro(memoria, registros, tablaSegmentos, operando2, A);
     }
 }
-void mv_ldl(char memoria[], int registros[], int tablaSegmentos[]){//precondicion: A tiene un tamaño de 32 bits
+void mv_ldh(char memoria[], int registros[], int tablaSegmentos[]){//precondicion: A tiene un tamaño de 32 bits
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
 
@@ -578,7 +578,7 @@ void mv_ldl(char memoria[], int registros[], int tablaSegmentos[]){//precondicio
     
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A);
 }
-void mv_ldh(char memoria[], int registros[], int tablaSegmentos[]){
+void mv_ldl(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
 
@@ -637,29 +637,76 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
 }
 
 int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 bits 
-    //PRECONDICION: el string debe tener significar un inmediato de menos de 4 bytes
+    //PRECONDICION: el string debe significar un inmediato de igual o menos que 4 bytes
     int inmediato=0;
-    for(int i=0; cadena[i]!='\0'; i++){
-        switch(formato){
-            case 0x1: //decimal
-                break;
-            case 0x2: //caracteres
-                break;
-            case 0x4: //octal
-                break;
-            case 0x8: //hexadecimal
-                break;
-            case 0x10: //binario
-                break;
-            default:
-                terminarPrograma("formato de escritura a memoria erroneo");
-        }
+    int largo = strlen(cadena);
+    switch(formato){
+        case 0x1: //decimal
+            return (int) strtol(cadena, NULL, 10);
+            break;
+        case 0x2: //caracteres
+            for (int i=largo-1; i>=0; i--){
+                //printf("i:%d, c:%d, inmediato:%X\n", i, cadena[i], inmediato);
+                inmediato = (inmediato << 8) | cadena[i];
+            }
+            return inmediato;
+            break;
+        case 0x4: //octal
+            return (int) strtol(cadena, NULL, 8);
+            break;
+        case 0x8: //hexadecimal
+            return (int) strtol(cadena, NULL, 16);
+            break;
+        case 0x10: //binario
+            return (int) strtol(cadena, NULL, 2);
+            break;
+        default:
+            terminarPrograma("formato de escritura a memoria erroneo");
     }
-
 }
 
 char* inmediatoToString(int inmediato, int formato){//
-    
+    static char cadena[192];
+    char temp[48];
+    cadena[0] = '\0';
+
+    int primero = 1;
+
+    if (formato & 0x01) { // decimal
+        snprintf(temp, sizeof(temp), "%d", inmediato);
+        strcat(cadena, temp);
+        primero = 0;
+    }
+    if (formato & 0x02) { // caracter
+        snprintf(temp, sizeof(temp), "%c", (inmediato >= 32 && inmediato <= 126) ? (char)inmediato : '.');
+        if (!primero) strcat(cadena, " ");
+        strcat(cadena, temp);
+        primero = 0;
+    }
+    if (formato & 0x04) { // octal
+        snprintf(temp, sizeof(temp), "0o%o", inmediato);
+        if (!primero) strcat(cadena, " ");
+        strcat(cadena, temp);
+        primero = 0;
+    }
+    if (formato & 0x08) { // hexadecimal
+        snprintf(temp, sizeof(temp), "0x%X", inmediato);
+        if (!primero) strcat(cadena, " ");
+        strcat(cadena, temp);
+        primero = 0;
+    }
+    if (formato & 0x10) { // binario
+        char binario[33] = {0};
+        for (int i = 31; i >= 0; i--) {
+            binario[31 - i] = (inmediato & (1 << i)) ? '1' : '0';
+        }
+        binario[32] = '\0';
+        snprintf(temp, sizeof(temp), "0b%s", binario);
+        if (!primero) strcat(cadena, " ");
+        strcat(cadena, temp);
+    }
+
+    return cadena;
 }
 
 void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
@@ -673,14 +720,15 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
     if(tamanioCelda < 1 || tamanioCelda > 4)  //solo puede escribir celdas de 1 a 4 bytes (MBR es de 32 bits)
         terminarPrograma("tamanio de celda invalido");
         
-        
+    //printf("dirLogica:%X, DS_INDEX:%X", dirLogica, DS_INDEX);
+    //printf("20:%d, 21:%d\n", memoria[20], memoria[21]);
     char* cadenaConsola;
     for(int i = 0; i < cantCeldas; i++){
-        if((dirLogica >> 16)!=DS_INDEX)  //controlamos que este en el DS
+        if((dirLogica >> 16)!=DS_SEG_INDEX)  //controlamos que este en el DS
             terminarPrograma("segmentatio fault, no puede escribir o leer datos fuera del DS");
         cargarLAR(dirLogica, registros);                                   
         cargarMAR(tamanioCelda, registros, tablaSegmentos);
-        printf("[%X]: ", registros[MAR_INDEX]);
+        printf("[%X]: ", registros[MAR_INDEX]&0xFFFF);
         if(modo == 1){ //READ (escribe en memoria lo leido en consola)
             scanf("%s", cadenaConsola);
             registros[MBR_INDEX] = cadenaToInmediato(cadenaConsola, formato);
