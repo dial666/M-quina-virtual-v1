@@ -77,6 +77,8 @@ void mv_stop(char memoria[], int registros[], int tablaSegmentos[]);
 void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]);
 
 int main(int argc, char *argv[]) {
+    if (argc < 2) 
+        terminarPrograma("falta archivo");
     srand(time(NULL)); //setea la seed de random con el tiempo para emular aleatoriedad
     int registros[TAM_REGISTROS]; //32 registros de 32 bits
     char memoria[TAM_MEMORIA];  //16 KiB
@@ -560,6 +562,8 @@ void mv_ldl(char memoria[], int registros[], int tablaSegmentos[]){
 void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){//genera solo enteros
     
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
+    if (B < 0) 
+        terminarPrograma("rango negativo en rnd");
 
     int aleatorio = (rand() % (B - 0 + 1)) + 0; //el formato es rd_num= (rd_num % (max - min + 1)) + min
     
