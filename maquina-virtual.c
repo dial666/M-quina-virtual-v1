@@ -478,19 +478,12 @@ void mv_shl(char memoria[], int registros[], int tablaSegmentos[]){
 }
 
 void mv_shr(char memoria[], int registros[], int tablaSegmentos[]){
-    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
-    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
 
-    int resultado = (A>>B) & mascara0primerosBits(B);
+    uint32_t A = (uint32_t)OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    uint32_t B = (uint32_t)OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos) & 31U;
 
-    
-    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], resultado);
-    actualizarCC(registros, resultado);
-
-    /*printf("A:0x%08X, B:%d, A>>B:0x%08X\n", A, B, resultado);
-    printf("Operando: 0x%X, valor:0x%08X\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
-
-    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]);*/
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], (int) (A >> B));
+    actualizarCC(registros, (int) (A >> B));
     
 }
 void mv_sar(char memoria[], int registros[], int tablaSegmentos[]){
@@ -729,7 +722,7 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
         }else if(modo == 2){// WRITE (escribe en consola)
             leerMemoria(memoria, registros);
             
-            printf("%s\n", inmediatoToString(registros[MBR_INDEX], formato));
+            printf("%199s\n", inmediatoToString(registros[MBR_INDEX], formato));
         }else
             terminarPrograma("operando invalido para instruccion sys");
             
