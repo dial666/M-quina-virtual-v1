@@ -769,13 +769,6 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
     terminarPrograma("codigo de operacion invalido");
 };
 
-int mascara0primerosBits(int cantBits){
-    if (cantBits <= 0) 
-        return 0xFFFFFFFF;
-    if (cantBits >= 32) 
-        return 0;
-    return ((1u << (32 - cantBits)) - 1u);
-}
 
 int tipoOperando(int operando){
     return (operando >> 24) & (0x00000003);
