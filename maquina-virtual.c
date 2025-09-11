@@ -303,7 +303,7 @@ void convertirArregloAInt(char arregloBytes[], int n, int *num) {
 
     *num = 0;
     for(i = 0; i < n; i++) {
-        aux = arregloBytes[i];
+        aux = arregloBytes[i] & 0xFF;
         aux = aux << (cantBytesDesplazar * 8);
         *num = *num | aux;
         cantBytesDesplazar--;
