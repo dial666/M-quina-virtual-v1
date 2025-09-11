@@ -663,10 +663,16 @@ char* inmediatoToString(int inmediato, int formato){//
         primero = 0;
     }
     if (formato & 0x02) { // caracter
-        snprintf(temp, sizeof(temp), "%c", (inmediato >= 32 && inmediato <= 126) ? (char)inmediato : '.');
-        if (!primero) strcat(cadena, " ");
-        strcat(cadena, temp);
-        primero = 0;
+        if (!primero) 
+            strcat(cadena, " ");
+        for(int i=0; i<4; i++){
+            char caracter = (inmediato >> (24-i*8)) & 0xFF;
+            if(caracter != 0){
+                snprintf(temp, sizeof(temp), "%c", (caracter >= 32 && caracter <= 126) ? caracter : '.');
+                strcat(cadena, temp);
+                primero = 0;
+            }
+        }
     }
     if (formato & 0x04) { // octal
         snprintf(temp, sizeof(temp), "0o%o", inmediato);
