@@ -240,7 +240,7 @@ void cargarMAR(int cantBytes, int registros[], int tablaSegmentos[]){
 void leerMemoria(char memoria[], int registros[]){
     
     int cantBytes = registros[MAR_INDEX] >> 16;
-    int direccion = registros[MAR_INDEX] & 0x00FF;
+    int direccion = registros[MAR_INDEX] & 0x00FFFF;
     int valor = 0;
     for(int i = 0; i < cantBytes; i++)
         valor = (valor << 8) | (memoria[direccion + i] & 0x000000FF);  // no mantiene signo de valor leido
