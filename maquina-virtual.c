@@ -607,8 +607,10 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
 
     printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); */
 
-    if((cc_n == n) && (cc_z == z))
+    if((cc_n == n) && (cc_z == z)){
         jump(memoria, registros, tablaSegmentos, operando);
+        return 1;
+    }
     else
         return 0;
 
