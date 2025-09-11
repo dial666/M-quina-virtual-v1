@@ -362,26 +362,23 @@ void store(char memoria[], int registros[], int tablaSegmentos[], int dirLogica,
 }
 
 void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos[], int operando, int valor){ //no se puede llamar con operando de tipo inmediato
-    int tipo = (operando >> 24) & (0x00000003);
+    int tipo = (operando >> 24) & 0x3;
     int valor_logico = (operando << 8) >> 8;
 
-    if (tipo == 1)
-        registros[valor_logico] = valor; //no contempla registro inexistente
-    else if(tipo == 3){
-        int registro = (valor_logico >> 16) & 0x1F;
+    if (tipo == 1){
+        registros[valor_logico] = valor;
+    }else if (tipo == 3){
+        int reg = (valor_logico >> 16) & 0x1F;
         int offset = (valor_logico << 16) >> 16;
-
-        int offsetRegistro = registro & 0xFFFF;
-        if (offset + offsetRegistro > 0xFFFF)
-            terminarPrograma("segmentation fault: offset supera rango permitido");
-
-        int dirLogica = registros[registro] + offset;
-        
-        store(memoria, registros, tablaSegmentos, dirLogica, 4, valor); //!!!!!!!!!! deberia escribir 2?
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    }
-    else
+        int base = registros[reg];
+        int seg = (base >> 16) & 0xFFFF;
+        int baseOff = base & 0xFFFF;
+        int nuevoOff = baseOff + offset;
+        if (nuevoOff < 0 || nuevoOff > 0xFFFF)
+            terminarPrograma("segmentation fault: offset fuera de rango");
+        int dirLog = (seg << 16) | (nuevoOff & 0xFFFF);
+        store(memoria, registros, tablaSegmentos, dirLog, 4, valor);
+    }else
         terminarPrograma("Solo es posible escribir en un registro o direccion de memoria");
 }
 
