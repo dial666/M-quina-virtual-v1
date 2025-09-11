@@ -78,6 +78,7 @@ void mv_stop(char memoria[], int registros[], int tablaSegmentos[]);
 void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]);
 
 int main(int argc, char *argv[]) {
+    srand(time(NULL)); //setea la seed de random con el tiempo para emular aleatoriedad
     int registros[TAM_REGISTROS]; //32 registros de 32 bits
     char memoria[TAM_MEMORIA];  //16 KiB
     int tablasegmentos[TAM_TABLA_SEGMENTOS]; //8 entradas de 32 bits
@@ -568,7 +569,7 @@ void mv_ldl(char memoria[], int registros[], int tablaSegmentos[]){
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A);
 }
 void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){//genera solo enteros
-    srand(time(NULL)); //setea la seed de random con el tiempo para emular aleatoriedad
+    
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
 
     int aleatorio = (rand() % (B - 0 + 1)) + 0; //el formato es rd_num= (rd_num % (max - min + 1)) + min
@@ -776,7 +777,11 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
 };
 
 int mascara0primerosBits(int cantBits){
-    return cantBits < 32 ? (1U << (32 - cantBits)) - 1 : 0;
+    if (cantBits <= 0) 
+        return 0xFFFFFFFF;
+    if (cantBits >= 32) 
+        return 0;
+    return ((1u << (32 - cantBits)) - 1u);
 }
 
 int tipoOperando(int operando){
