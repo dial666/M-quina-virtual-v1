@@ -39,7 +39,6 @@ void terminarPrograma(char mensaje[]);
 int verificarNumOperacion(char primer_byte);
 void mostrarArreglo(char arr[], int n);
 void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]);
-int mascara0primerosBits(int cantBits);
 int tipoOperando(int operando);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]);
@@ -712,14 +711,14 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
         cargarMAR(tamanioCelda, registros, tablaSegmentos);
         printf("[%X]: ", registros[MAR_INDEX]&0xFFFF);
         if(modo == 1){ //READ (escribe en memoria lo leido en consola)
-            scanf("%s", cadenaConsola);
+            scanf("%199s", cadenaConsola);
             registros[MBR_INDEX] = cadenaToInmediato(cadenaConsola, formato);
             escribirMemoria(memoria, registros, tablaSegmentos);
 
         }else if(modo == 2){// WRITE (escribe en consola)
             leerMemoria(memoria, registros);
             
-            printf("%199s\n", inmediatoToString(registros[MBR_INDEX], formato));
+            printf("%s\n", inmediatoToString(registros[MBR_INDEX], formato));
         }else
             terminarPrograma("operando invalido para instruccion sys");
             
