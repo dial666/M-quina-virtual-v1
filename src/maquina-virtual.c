@@ -339,19 +339,12 @@ void mv_shl(char memoria[], int registros[], int tablaSegmentos[]){
 }
 
 void mv_shr(char memoria[], int registros[], int tablaSegmentos[]){
-    int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
-    int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
 
-    int resultado = (A>>B) & mascara0primerosBits(B);
+    uint32_t A = (uint32_t)OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
+    uint32_t B = (uint32_t)OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos) & 31U;
 
-    
-    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], resultado);
-    actualizarCC(registros, resultado);
-
-    /*printf("A:0x%08X, B:%d, A>>B:0x%08X\n", A, B, resultado);
-    printf("Operando: 0x%X, valor:0x%08X\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
-
-    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]);*/
+    escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], (int) (A >> B));
+    actualizarCC(registros, (int) (A >> B));
     
 }
 void mv_sar(char memoria[], int registros[], int tablaSegmentos[]){
@@ -430,8 +423,10 @@ void mv_ldl(char memoria[], int registros[], int tablaSegmentos[]){
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A);
 }
 void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){//genera solo enteros
-    srand(time(NULL)); //setea la seed de random con el tiempo para emular aleatoriedad
+    
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
+    if (B < 0) 
+        terminarPrograma("rango negativo en rnd");
 
     int aleatorio = (rand() % (B - 0 + 1)) + 0; //el formato es rd_num= (rd_num % (max - min + 1)) + min
     
@@ -469,27 +464,35 @@ int jumpif(char memoria[], int registros[], int tablaSegmentos[], int operando, 
 
     printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); */
 
-    if((cc_n == n) && (cc_z == z))
+    if((cc_n == n) && (cc_z == z)){
         jump(memoria, registros, tablaSegmentos, operando);
+        return 1;
+    }
     else
         return 0;
 
     
 }
 
+int minimo(int a, int b){
+    if (a>b)
+        return b;
+    else 
+        return a;
+}
+
+
 int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 bits 
     //PRECONDICION: el string debe significar un inmediato de igual o menos que 4 bytes
     int inmediato=0;
-    int largo = strlen(cadena);
+    int largo = minimo(strlen(cadena), 4);
     switch(formato){
         case 0x1: //decimal
             return (int) strtol(cadena, NULL, 10);
             break;
         case 0x2: //caracteres
-            for (int i=largo-1; i>=0; i--){
-                //printf("i:%d, c:%d, inmediato:%X\n", i, cadena[i], inmediato);
+            for (int i=0; i<largo; i++)
                 inmediato = (inmediato << 8) | cadena[i];
-            }
             return inmediato;
             break;
         case 0x4: //octal
@@ -519,10 +522,16 @@ char* inmediatoToString(int inmediato, int formato){//
         primero = 0;
     }
     if (formato & 0x02) { // caracter
-        snprintf(temp, sizeof(temp), "%c", (inmediato >= 32 && inmediato <= 126) ? (char)inmediato : '.');
-        if (!primero) strcat(cadena, " ");
-        strcat(cadena, temp);
-        primero = 0;
+        if (!primero) 
+            strcat(cadena, " ");
+        for(int i=0; i<4; i++){
+            char caracter = (inmediato >> (24-i*8)) & 0xFF;
+            if(caracter != 0){
+                snprintf(temp, sizeof(temp), "%c", (caracter >= 32 && caracter <= 126) ? caracter : '.');
+                strcat(cadena, temp);
+                primero = 0;
+            }
+        }
     }
     if (formato & 0x04) { // octal
         snprintf(temp, sizeof(temp), "0o%o", inmediato);
@@ -561,21 +570,21 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
     if(tamanioCelda < 1 || tamanioCelda > 4)  //solo puede escribir celdas de 1 a 4 bytes (MBR es de 32 bits)
         terminarPrograma("tamanio de celda invalido");
         
-    //printf("dirLogica:%X, DS_INDEX:%X", dirLogica, DS_INDEX);
-    //printf("20:%d, 21:%d\n", memoria[20], memoria[21]);
-    char* cadenaConsola;
+    char cadenaConsola[200];    //SI NO LE PONGO TAMAÑO, INVADE LA MEMORIA Y ME CAMBIA OTRAS COSAS LPMMMM
     for(int i = 0; i < cantCeldas; i++){
-        if((dirLogica >> 16)!=DS_SEG_INDEX)  //controlamos que este en el DS
+        if((dirLogica >> 16)!=(registros[DS_INDEX]>>16))  //controlamos que este en el DS
             terminarPrograma("segmentatio fault, no puede escribir o leer datos fuera del DS");
-        cargarLAR(dirLogica, registros);                                   
+        cargarLAR(dirLogica, registros);
         cargarMAR(tamanioCelda, registros, tablaSegmentos);
         printf("[%X]: ", registros[MAR_INDEX]&0xFFFF);
         if(modo == 1){ //READ (escribe en memoria lo leido en consola)
-            scanf("%s", cadenaConsola);
+            scanf("%199s", cadenaConsola);
             registros[MBR_INDEX] = cadenaToInmediato(cadenaConsola, formato);
             escribirMemoria(memoria, registros, tablaSegmentos);
+
         }else if(modo == 2){// WRITE (escribe en consola)
             leerMemoria(memoria, registros);
+            
             printf("%s\n", inmediatoToString(registros[MBR_INDEX], formato));
         }else
             terminarPrograma("operando invalido para instruccion sys");
@@ -623,26 +632,11 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
     terminarPrograma("codigo de operacion invalido");
 };
 
-int mascara0primerosBits(int cantBits){
-    return cantBits < 32 ? (1U << (32 - cantBits)) - 1 : 0;
-}
-
 void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones) {
-    //ciclo de fetch-decode-execute
-    //prueba
-    //printf("llega a ejecutar\n");
-   /*  memoria[7] = 2;
-    memoria[8] = 0xFF;
-    memoria[9] = 0xFD; */
-
-
     //ciclo real
     while(registros[IP_INDEX] != -1){
         fetchInstruccion(memoria, registros, tablaSegmentos);
-        //printf("fetched\n");
         decodeInstruccion(memoria, registros, tablaSegmentos);
-        //printf("decoded\n");
-        //printf("%02X\n", registros[OPC_INDEX]);
         operaciones[registros[OPC_INDEX]](memoria, registros, tablaSegmentos);
     }
 }
