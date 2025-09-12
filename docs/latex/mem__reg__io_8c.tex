@@ -1,0 +1,296 @@
+\doxysection{src/mem\+\_\+reg\+\_\+io.c File Reference}
+\hypertarget{mem__reg__io_8c}{}\label{mem__reg__io_8c}\index{src/mem\_reg\_io.c@{src/mem\_reg\_io.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}mem\+\_\+reg\+\_\+io.\+h"{}}\newline
+{\ttfamily \#include "{}constantes.\+h"{}}\newline
+{\ttfamily \#include "{}utils.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{mem__reg__io_8c_aa010f44596d0fa5c3d4dce05a82687bb}{cargar\+LAR}} (int dir\+Logica, int registros\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Carga en el LAR una dirección lógica. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_a778e4d867cd66ddf146858a366f4ad7b}{verificar\+Indice\+Segmento}} (int indice\+Segmento, int tabla\+Segmentos\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Verifica el índice usado para acceder a la tabla de segmentos. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_a99cf75399d343c71fff04fe960c2a7cd}{cargar\+MAR}} (int cant\+Bytes, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Pone en el MAR los datos necesarios o termina el porgrama si son incorrectos. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_ac9d4b807b38dddb8abc7edf82b388550}{leer\+Memoria}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Pone en MBR un valor leído de memoria. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_a44997b88e824e02b6294b66cb0996487}{cargar\+MBR}} (int registros\mbox{[}$\,$\mbox{]}, int valor)
+\begin{DoxyCompactList}\small\item\em Pone en MBR un valor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_a41ea255192acabf6dd7f780121b37f14}{escribir\+Memoria}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Pone en las celdas de memoria un valor guardado en MBR. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_a63487f3a7043da9bc09e1b74f573360f}{store}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]}, int dir\+Logica, int cant\+Bytes, int valor)
+\begin{DoxyCompactList}\small\item\em Invoca las funciones necesarias para escribir en memoria en el orden correcto. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_a142a0be58eacd01a390d94bf02df0507}{verificar\+Indice\+Registro}} (int index\+Reg)
+\begin{DoxyCompactList}\small\item\em Valida que un registro exista. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_af5259b4c87007a85287a673355ea4c1f}{escribir\+Memoria\+Registro}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]}, int operando, int valor)
+\begin{DoxyCompactList}\small\item\em Escribe en un registro o en memoria un valor. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{mem__reg__io_8c_ac080994299f6d8112dd340dd502bad95}{Operandoto\+Inmediato}} (int operando, char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Obtiene el valor de un operando. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{mem__reg__io_8c_aa79c8d366a3dd450a0101838665a3e20}{fetch}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]}, int dir\+Logica, int cant\+Bytes)
+\begin{DoxyCompactList}\small\item\em Invoca las funciones necesarias para leer de memoria en el orden correcto. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\label{doc-func-members}
+\Hypertarget{mem__reg__io_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{mem__reg__io_8c_aa010f44596d0fa5c3d4dce05a82687bb}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!cargarLAR@{cargarLAR}}
+\index{cargarLAR@{cargarLAR}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{cargarLAR()}{cargarLAR()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_aa010f44596d0fa5c3d4dce05a82687bb} 
+void cargar\+LAR (\begin{DoxyParamCaption}\item[{int}]{dir\+Logica}{, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Carga en el LAR una dirección lógica. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir\+Logica} & \\
+\hline
+{\em registros} & \\
+\hline
+\end{DoxyParams}
+\Hypertarget{mem__reg__io_8c_a99cf75399d343c71fff04fe960c2a7cd}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!cargarMAR@{cargarMAR}}
+\index{cargarMAR@{cargarMAR}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{cargarMAR()}{cargarMAR()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_a99cf75399d343c71fff04fe960c2a7cd} 
+void cargar\+MAR (\begin{DoxyParamCaption}\item[{int}]{cant\+Bytes}{, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Pone en el MAR los datos necesarios o termina el porgrama si son incorrectos. 
+
+Crea la dirección física a partir de la dirección lógica en LAR. Si la dirección base del segmento apuntado por los primeros 2 bytes de la dirección lógica es menor o igual a la dirección física y el límite de acceso es menor al límite del segmento, en los 2 bytes más significativos de MAR irá la cantidad de bytes a leer/escribir y en los otros 2 irá la dirección física. De no cumplirse, termina el programa.
+
+
+\begin{DoxyParams}{Parameters}
+{\em cant\+Bytes} & Cantidad de bytes a leer/escribir en memoria. \\
+\hline
+{\em registros} & \\
+\hline
+{\em tabla\+Segmentos} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+LAR debe tener algún valor. 
+
+cant\+Bytes debe ser menor o igual a 4. 
+\end{DoxyPrecond}
+\Hypertarget{mem__reg__io_8c_a44997b88e824e02b6294b66cb0996487}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!cargarMBR@{cargarMBR}}
+\index{cargarMBR@{cargarMBR}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{cargarMBR()}{cargarMBR()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_a44997b88e824e02b6294b66cb0996487} 
+void cargar\+MBR (\begin{DoxyParamCaption}\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{valor}{}\end{DoxyParamCaption})}
+
+
+
+Pone en MBR un valor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em registros} & \\
+\hline
+{\em valor} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\doxylink{mem__reg__io_8c_a63487f3a7043da9bc09e1b74f573360f}{store()} 
+\end{DoxySeeAlso}
+\Hypertarget{mem__reg__io_8c_a41ea255192acabf6dd7f780121b37f14}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!escribirMemoria@{escribirMemoria}}
+\index{escribirMemoria@{escribirMemoria}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{escribirMemoria()}{escribirMemoria()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_a41ea255192acabf6dd7f780121b37f14} 
+void escribir\+Memoria (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Pone en las celdas de memoria un valor guardado en MBR. 
+
+Extrae la cantidad de bytes a leer y la dirección física de MAR. Guarda byte por byte en las celdas de memoria con la representación big-\/endian. El proceso de guardado es el siguiente\+: -\/Mueve hacia la izquierda el valor en MBR, dejando el byte a guardar en el más significativo. -\/Lo baja a los 8 bits más bajos. -\/Lo asigna a la celda de memoria correspondiente y como esta es char, solamente se queda con los 8 bits menos significativos del resultado de los desplazamientos. Es decir, no importa si se propagaron 1s en el proceso.
+
+
+\begin{DoxyParams}{Parameters}
+{\em memoria} & \\
+\hline
+{\em registros} & \\
+\hline
+{\em tabla\+Segmentos} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+En MAR debe haber en los 2 bytes más significativos la cantidad de bytes a leer y en los otros 2 una dirección física válida. 
+
+En MBR debe haber un valor. 
+\end{DoxyPrecond}
+\Hypertarget{mem__reg__io_8c_af5259b4c87007a85287a673355ea4c1f}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!escribirMemoriaRegistro@{escribirMemoriaRegistro}}
+\index{escribirMemoriaRegistro@{escribirMemoriaRegistro}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{escribirMemoriaRegistro()}{escribirMemoriaRegistro()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_af5259b4c87007a85287a673355ea4c1f} 
+void escribir\+Memoria\+Registro (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{operando}{, }\item[{int}]{valor}{}\end{DoxyParamCaption})}
+
+
+
+Escribe en un registro o en memoria un valor. 
+
+Extrae el tipo de operando y el resto de los datos (registro, offset) del operando. Realiza distintas instrucciones de escritura de acuerdo al tipo de operando. Si es de memoria, controla que la suma del offset de la dirección lógica en el registro indicado por el operando y el offset del operando no superen los 2 bytes. Esto es para que no ocurra un overflow y se "{}contamine"{} el puntero a la dirección del segmento en la dirección lógica. De no cumplirse esta condición, se termina el programa. Si se cumple, se arma la nueva dirección lógica y se invoca a \doxylink{mem__reg__io_8c_a63487f3a7043da9bc09e1b74f573360f}{store()}.
+
+\begin{DoxyWarning}{Warning}
+Quizás sea mejor hacer dicha validación en su propia función.
+\end{DoxyWarning}
+
+\begin{DoxyParams}{Parameters}
+{\em memoria} & \\
+\hline
+{\em registros} & \\
+\hline
+{\em tabla\+Segmentos} & \\
+\hline
+{\em operando} & Valor del registro OP1 u OP2. \\
+\hline
+{\em valor} & Valor a escribir en registro o en memoria.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+El operando no es de tipo inmediato. 
+\end{DoxyPrecond}
+\Hypertarget{mem__reg__io_8c_aa79c8d366a3dd450a0101838665a3e20}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!fetch@{fetch}}
+\index{fetch@{fetch}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{fetch()}{fetch()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_aa79c8d366a3dd450a0101838665a3e20} 
+void fetch (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{dir\+Logica}{, }\item[{int}]{cant\+Bytes}{}\end{DoxyParamCaption})}
+
+
+
+Invoca las funciones necesarias para leer de memoria en el orden correcto. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em memoria} & \\
+\hline
+{\em registros} & \\
+\hline
+{\em tabla\+Segmentos} & \\
+\hline
+{\em dir\+Logica} & Dirección lógica derivada de un operando de memoria. \\
+\hline
+{\em cant\+Bytes} & Cantidad de bytes/celdas a leer de memoria. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{mem__reg__io_8c_ac9d4b807b38dddb8abc7edf82b388550}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!leerMemoria@{leerMemoria}}
+\index{leerMemoria@{leerMemoria}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{leerMemoria()}{leerMemoria()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_ac9d4b807b38dddb8abc7edf82b388550} 
+void leer\+Memoria (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Pone en MBR un valor leído de memoria. 
+
+Extrae la cantidad de bytes a leer y la dirección física de MAR. Utiliza una variable auxiliar inicializada en 0 con la cual, mediante corrimientos y la operación OR con cada celda de memoria, convierte lo guardado en varias celdas de memoria a un valor int. Se asegura de restaurar el signo del número leído. Al final, lo guarda en MBR.
+
+
+\begin{DoxyParams}{Parameters}
+{\em memoria} & \\
+\hline
+{\em registros} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+En MAR debe haber en los 2 bytes más significativos la cantidad de bytes a leer y en los otros 2 una dirección física válida. 
+\end{DoxyPrecond}
+\Hypertarget{mem__reg__io_8c_ac080994299f6d8112dd340dd502bad95}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!OperandotoInmediato@{OperandotoInmediato}}
+\index{OperandotoInmediato@{OperandotoInmediato}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{OperandotoInmediato()}{OperandotoInmediato()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_ac080994299f6d8112dd340dd502bad95} 
+int Operandoto\+Inmediato (\begin{DoxyParamCaption}\item[{int}]{operando}{, }\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Obtiene el valor de un operando. 
+
+\begin{DoxyWarning}{Warning}
+Cuando el operando es de memoria, no verifica que no haya overflow con el offset, algo que sí se hace en \doxylink{mem__reg__io_8c_af5259b4c87007a85287a673355ea4c1f}{escribir\+Memoria\+Registro()}. 
+\end{DoxyWarning}
+\begin{DoxySeeAlso}{See also}
+\doxylink{mem__reg__io_8c_af5259b4c87007a85287a673355ea4c1f}{escribir\+Memoria\+Registro()}.
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em operando} & Valor en OP1 u OP2. \\
+\hline
+{\em memoria} & \\
+\hline
+{\em registros} & \\
+\hline
+{\em tabla\+Segmentos} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int Valor del operando. 
+\end{DoxyReturn}
+\Hypertarget{mem__reg__io_8c_a63487f3a7043da9bc09e1b74f573360f}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!store@{store}}
+\index{store@{store}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{store()}{store()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_a63487f3a7043da9bc09e1b74f573360f} 
+void store (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{dir\+Logica}{, }\item[{int}]{cant\+Bytes}{, }\item[{int}]{valor}{}\end{DoxyParamCaption})}
+
+
+
+Invoca las funciones necesarias para escribir en memoria en el orden correcto. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em memoria} & \\
+\hline
+{\em registros} & \\
+\hline
+{\em tabla\+Segmentos} & \\
+\hline
+{\em dir\+Logica} & Dirección lógica derivada de un operando de memoria. \\
+\hline
+{\em cant\+Bytes} & Cantidad de bytes/celdas a escribir en memoria. \\
+\hline
+{\em valor} & Valor a escribir en memoria.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+cant\+Bytes debe ser menor o igual a 4. 
+\end{DoxyPrecond}
+\Hypertarget{mem__reg__io_8c_a142a0be58eacd01a390d94bf02df0507}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!verificarIndiceRegistro@{verificarIndiceRegistro}}
+\index{verificarIndiceRegistro@{verificarIndiceRegistro}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{verificarIndiceRegistro()}{verificarIndiceRegistro()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_a142a0be58eacd01a390d94bf02df0507} 
+void verificar\+Indice\+Registro (\begin{DoxyParamCaption}\item[{int}]{index\+Reg}{}\end{DoxyParamCaption})}
+
+
+
+Valida que un registro exista. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\+Reg} & Índice de un registro. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{mem__reg__io_8c_a778e4d867cd66ddf146858a366f4ad7b}\index{mem\_reg\_io.c@{mem\_reg\_io.c}!verificarIndiceSegmento@{verificarIndiceSegmento}}
+\index{verificarIndiceSegmento@{verificarIndiceSegmento}!mem\_reg\_io.c@{mem\_reg\_io.c}}
+\doxysubsubsection{\texorpdfstring{verificarIndiceSegmento()}{verificarIndiceSegmento()}}
+{\footnotesize\ttfamily \label{mem__reg__io_8c_a778e4d867cd66ddf146858a366f4ad7b} 
+void verificar\+Indice\+Segmento (\begin{DoxyParamCaption}\item[{int}]{indice\+Segmento}{, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Verifica el índice usado para acceder a la tabla de segmentos. 
+
+Verifica que el índice sea menor a 8 y que la tabla tenga un valor válido en esa posición. Es decir, que tenga un valor distinto a -\/1. Si el índice no es válido, termina el programa.
+
+
+\begin{DoxyParams}{Parameters}
+{\em indice\+Segmento} & Los 2 bytes más significativos de una dirección lógica. \\
+\hline
+{\em tabla\+Segmentos} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+La tabla de segmentos debe estar inicializada con -\/1 o un valor válido. 
+\end{DoxyPrecond}

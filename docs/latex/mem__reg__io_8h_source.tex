@@ -1,0 +1,23 @@
+\doxysection{mem\+\_\+reg\+\_\+io.\+h}
+\hypertarget{mem__reg__io_8h_source}{}\label{mem__reg__io_8h_source}\index{include/mem\_reg\_io.h@{include/mem\_reg\_io.h}}
+\mbox{\hyperlink{mem__reg__io_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ MEM\_REG\_IO\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ MEM\_REG\_IO\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_aa010f44596d0fa5c3d4dce05a82687bb}{cargarLAR}}(\textcolor{keywordtype}{int}\ dirLogica,\ \textcolor{keywordtype}{int}\ registros[]);}
+\DoxyCodeLine{00011\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_a778e4d867cd66ddf146858a366f4ad7b}{verificarIndiceSegmento}}(\textcolor{keywordtype}{int}\ indiceSegmento,\ \textcolor{keywordtype}{int}\ tablaSegmentos[]);}
+\DoxyCodeLine{00012\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_a99cf75399d343c71fff04fe960c2a7cd}{cargarMAR}}(\textcolor{keywordtype}{int}\ cantBytes,\ \textcolor{keywordtype}{int}\ registros[],\ \textcolor{keywordtype}{int}\ tablaSegmentos[]);}
+\DoxyCodeLine{00013\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_ac9d4b807b38dddb8abc7edf82b388550}{leerMemoria}}(\textcolor{keywordtype}{char}\ memoria[],\ \textcolor{keywordtype}{int}\ registros[]);}
+\DoxyCodeLine{00014\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_a44997b88e824e02b6294b66cb0996487}{cargarMBR}}(\textcolor{keywordtype}{int}\ registros[],\ \textcolor{keywordtype}{int}\ valor);}
+\DoxyCodeLine{00015\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_a41ea255192acabf6dd7f780121b37f14}{escribirMemoria}}(\textcolor{keywordtype}{char}\ memoria[],\ \textcolor{keywordtype}{int}\ registros[],\ \textcolor{keywordtype}{int}\ tablaSegmentos[]);}
+\DoxyCodeLine{00016\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_a63487f3a7043da9bc09e1b74f573360f}{store}}(\textcolor{keywordtype}{char}\ memoria[],\ \textcolor{keywordtype}{int}\ registros[],\ \textcolor{keywordtype}{int}\ tablaSegmentos[],\ \textcolor{keywordtype}{int}\ dirLogica,\ \textcolor{keywordtype}{int}\ cantBytes,\ \textcolor{keywordtype}{int}\ valor);}
+\DoxyCodeLine{00017\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_af5259b4c87007a85287a673355ea4c1f}{escribirMemoriaRegistro}}(\textcolor{keywordtype}{char}\ memoria[],\ \textcolor{keywordtype}{int}\ registros[],\ \textcolor{keywordtype}{int}\ tablaSegmentos[],\ \textcolor{keywordtype}{int}\ operando,\ \textcolor{keywordtype}{int}\ valor);}
+\DoxyCodeLine{00018\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mem__reg__io_8h_ac080994299f6d8112dd340dd502bad95}{OperandotoInmediato}}(\textcolor{keywordtype}{int}\ operando,\ \textcolor{keywordtype}{char}\ memoria[],\ \textcolor{keywordtype}{int}\ registros[],\ \textcolor{keywordtype}{int}\ tablaSegmentos[]);}
+\DoxyCodeLine{00019\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_a142a0be58eacd01a390d94bf02df0507}{verificarIndiceRegistro}}(\textcolor{keywordtype}{int}\ indexReg);}
+\DoxyCodeLine{00020\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{mem__reg__io_8h_aa79c8d366a3dd450a0101838665a3e20}{fetch}}(\textcolor{keywordtype}{char}\ memoria[],\ \textcolor{keywordtype}{int}\ registros[],\ \textcolor{keywordtype}{int}\ tablaSegmentos[],\ \textcolor{keywordtype}{int}\ dirLogica,\ \textcolor{keywordtype}{int}\ cantBytes);}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

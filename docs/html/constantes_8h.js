@@ -1,0 +1,26 @@
+var constantes_8h =
+[
+    [ "AC_INDEX", "constantes_8h.html#a8ea9f242d982ffb4e8cb4c96abea5fa2", null ],
+    [ "CANT_BYTES_TAM_CODIGO", "constantes_8h.html#a6af28c8c385175ccefb8f7d4d1a84f59", null ],
+    [ "CC_INDEX", "constantes_8h.html#a2daab1687811f2eef90c2c9980ef4428", null ],
+    [ "CS_INDEX", "constantes_8h.html#afcb9f3b388e4f91f82cf7bd9d995e16c", null ],
+    [ "CS_SEG_INDEX", "constantes_8h.html#a47bbda127656c7626363d56758edab7c", null ],
+    [ "DS_INDEX", "constantes_8h.html#a7d1a2b69093fd64e7bb5ed86213747be", null ],
+    [ "DS_SEG_INDEX", "constantes_8h.html#a65df3e883e2a02b7ef26e720e406ed0e", null ],
+    [ "EAX_INDEX", "constantes_8h.html#a768fbb99e3fbdd26b11b0db78aab3f1f", null ],
+    [ "EBX_INDEX", "constantes_8h.html#ae0946f459dca5c7f885f20a322ba5095", null ],
+    [ "ECX_INDEX", "constantes_8h.html#a3d28a1ca6b5b2c367804ff145003f462", null ],
+    [ "EDX_INDEX", "constantes_8h.html#a5a8eae52f8ccbae020a6c74fad9d0e03", null ],
+    [ "EEX_INDEX", "constantes_8h.html#a409bb308e57d36740afaa3a6a2e35287", null ],
+    [ "EFX_INDEX", "constantes_8h.html#aa28fa287fca83629ad86c1184c84e76f", null ],
+    [ "IP_INDEX", "constantes_8h.html#ad619a2ccaa25eeff5f4cace25452e690", null ],
+    [ "LAR_INDEX", "constantes_8h.html#aade4bad517354407e48a3b6dab7cc2ce", null ],
+    [ "MAR_INDEX", "constantes_8h.html#a7395c4b11296f92adf541ad0e47a4ff8", null ],
+    [ "MBR_INDEX", "constantes_8h.html#a3f0559e201686ec82089a5ba56f1427a", null ],
+    [ "OP1_INDEX", "constantes_8h.html#a2ee7cec90b5c2c4d7dd93b45c2b84661", null ],
+    [ "OP2_INDEX", "constantes_8h.html#a4a8fce76b8019a1b5c464efd6d072d3b", null ],
+    [ "OPC_INDEX", "constantes_8h.html#afa2a476dd84b68c53b8994a3da4da427", null ],
+    [ "TAM_MEMORIA", "constantes_8h.html#abb75a171a7455ec2681e670b0af761f5", null ],
+    [ "TAM_REGISTROS", "constantes_8h.html#a8f535716a7773edc566828efb4ea4bea", null ],
+    [ "TAM_TABLA_SEGMENTOS", "constantes_8h.html#a14fc9690d7f65a6d80e04ed40791c92a", null ]
+];
