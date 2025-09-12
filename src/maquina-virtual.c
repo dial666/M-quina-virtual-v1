@@ -94,7 +94,6 @@ int main(int argc, char *argv[]) {
 
     leerArchivoEntrada(argv[1], memoria, tablasegmentos, registros);
     disassembler = argc==3 && strcmp(argv[2], "-d")==0;
-    printf("disassembler: %d\n", disassembler);
     ejecutarPrograma(memoria, registros, tablasegmentos, operaciones, disassembler);
 
     return 0;
