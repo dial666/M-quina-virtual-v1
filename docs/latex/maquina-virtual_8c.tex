@@ -8,6 +8,7 @@
 {\ttfamily \#include "{}mem\+\_\+reg\+\_\+io.\+h"{}}\newline
 {\ttfamily \#include "{}constantes.\+h"{}}\newline
 {\ttfamily \#include "{}utils.\+h"{}}\newline
+{\ttfamily \#include "{}disassembler.\+h"{}}\newline
 \doxysubsubsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
@@ -18,7 +19,7 @@ typedef void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{maquina-virtual_8c_ae55
 \item 
 int \mbox{\hyperlink{maquina-virtual_8c_ad58234da428b2ac797a0444e31b41bc3}{verificar\+Num\+Operacion}} (char primer\+\_\+byte)
 \item 
-void \mbox{\hyperlink{maquina-virtual_8c_aa9064b3c7301746214e0e4626ff3ecec}{mostrar\+Arreglo}} (char arr\mbox{[}$\,$\mbox{]}, int n)
+void \mbox{\hyperlink{maquina-virtual_8c_a91221ab12cb3de7102c7b9cce9729694}{mostrar\+Arreglo}} (char \texorpdfstring{$\ast$}{*}arr\mbox{[}$\,$\mbox{]}, int n)
 \item 
 void \mbox{\hyperlink{maquina-virtual_8c_a778e4d867cd66ddf146858a366f4ad7b}{verificar\+Indice\+Segmento}} (int indice\+Segmento, int tabla\+Segmentos\mbox{[}$\,$\mbox{]})
 \begin{DoxyCompactList}\small\item\em Verifica el índice usado para acceder a la tabla de segmentos. \end{DoxyCompactList}\item 
@@ -32,7 +33,7 @@ void \mbox{\hyperlink{maquina-virtual_8c_af23fa8bf44ba5caf97848689cc85e084}{inic
 \item 
 void \mbox{\hyperlink{maquina-virtual_8c_a267e3c32a0f11cc4de3ee89007ffa8c3}{inicializar\+Punteros\+Inicio\+Segmentos}} (int tabla\+Segmentos\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]})
 \item 
-void \mbox{\hyperlink{maquina-virtual_8c_a67914c37e3f78233ca246a69debf4285}{ejecutar\+Programa}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]}, \mbox{\hyperlink{maquina-virtual_8c_ae55007a2c29ecdef632cb2d5e6199e89}{Array\+Operaciones}} operaciones)
+void \mbox{\hyperlink{maquina-virtual_8c_a66f004be77905ffb51369916250275b4}{ejecutar\+Programa}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]}, \mbox{\hyperlink{maquina-virtual_8c_ae55007a2c29ecdef632cb2d5e6199e89}{Array\+Operaciones}} operaciones, int disassembler)
 \item 
 void \mbox{\hyperlink{maquina-virtual_8c_ae04b92c4675016ef76e0f1a910ad70f8}{mv\+\_\+mov}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]})
 \item 
@@ -94,7 +95,7 @@ void \mbox{\hyperlink{maquina-virtual_8c_a81218959a4c408bd96ce7acfdf75be33}{inte
 \item 
 void \mbox{\hyperlink{maquina-virtual_8c_ab33f1c9f9735a7bc21f1fdcc9ec0188e}{fetch\+Instruccion}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]})
 \item 
-void \mbox{\hyperlink{maquina-virtual_8c_adb791314f949f70c4a413c6a69c029ed}{decode\+Instruccion}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]})
+void \mbox{\hyperlink{maquina-virtual_8c_aad80d2752b794abe084dc1518fa5c5cb}{decode\+Instruccion}} (char memoria\mbox{[}$\,$\mbox{]}, int registros\mbox{[}$\,$\mbox{]}, int tabla\+Segmentos\mbox{[}$\,$\mbox{]}, int disassembler)
 \item 
 void \mbox{\hyperlink{maquina-virtual_8c_aaa198e597ff893990bac476feb30d86a}{actualizar\+CC}} (int registros\mbox{[}$\,$\mbox{]}, int valor)
 \item 
@@ -150,17 +151,17 @@ int cadena\+To\+Inmediato (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$
 {\footnotesize\ttfamily \label{maquina-virtual_8c_a68954588542974797745363c7c003fe6} 
 void convertir\+Arreglo\+AInt (\begin{DoxyParamCaption}\item[{char}]{arreglo\+Bytes}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{n}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{num}{}\end{DoxyParamCaption})}
 
-\Hypertarget{maquina-virtual_8c_adb791314f949f70c4a413c6a69c029ed}\index{maquina-\/virtual.c@{maquina-\/virtual.c}!decodeInstruccion@{decodeInstruccion}}
+\Hypertarget{maquina-virtual_8c_aad80d2752b794abe084dc1518fa5c5cb}\index{maquina-\/virtual.c@{maquina-\/virtual.c}!decodeInstruccion@{decodeInstruccion}}
 \index{decodeInstruccion@{decodeInstruccion}!maquina-\/virtual.c@{maquina-\/virtual.c}}
 \doxysubsubsection{\texorpdfstring{decodeInstruccion()}{decodeInstruccion()}}
-{\footnotesize\ttfamily \label{maquina-virtual_8c_adb791314f949f70c4a413c6a69c029ed} 
-void decode\+Instruccion (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \label{maquina-virtual_8c_aad80d2752b794abe084dc1518fa5c5cb} 
+void decode\+Instruccion (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{disassembler}{}\end{DoxyParamCaption})}
 
-\Hypertarget{maquina-virtual_8c_a67914c37e3f78233ca246a69debf4285}\index{maquina-\/virtual.c@{maquina-\/virtual.c}!ejecutarPrograma@{ejecutarPrograma}}
+\Hypertarget{maquina-virtual_8c_a66f004be77905ffb51369916250275b4}\index{maquina-\/virtual.c@{maquina-\/virtual.c}!ejecutarPrograma@{ejecutarPrograma}}
 \index{ejecutarPrograma@{ejecutarPrograma}!maquina-\/virtual.c@{maquina-\/virtual.c}}
 \doxysubsubsection{\texorpdfstring{ejecutarPrograma()}{ejecutarPrograma()}}
-{\footnotesize\ttfamily \label{maquina-virtual_8c_a67914c37e3f78233ca246a69debf4285} 
-void ejecutar\+Programa (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}, }\item[{\mbox{\hyperlink{maquina-virtual_8c_ae55007a2c29ecdef632cb2d5e6199e89}{Array\+Operaciones}}}]{operaciones}{}\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \label{maquina-virtual_8c_a66f004be77905ffb51369916250275b4} 
+void ejecutar\+Programa (\begin{DoxyParamCaption}\item[{char}]{memoria}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{registros}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{tabla\+Segmentos}{\mbox{[}$\,$\mbox{]}, }\item[{\mbox{\hyperlink{maquina-virtual_8c_ae55007a2c29ecdef632cb2d5e6199e89}{Array\+Operaciones}}}]{operaciones}{, }\item[{int}]{disassembler}{}\end{DoxyParamCaption})}
 
 \Hypertarget{maquina-virtual_8c_ab33f1c9f9735a7bc21f1fdcc9ec0188e}\index{maquina-\/virtual.c@{maquina-\/virtual.c}!fetchInstruccion@{fetchInstruccion}}
 \index{fetchInstruccion@{fetchInstruccion}!maquina-\/virtual.c@{maquina-\/virtual.c}}
@@ -228,11 +229,11 @@ int mascara0primeros\+Bits (\begin{DoxyParamCaption}\item[{int}]{cant\+Bits}{}\e
 {\footnotesize\ttfamily \label{maquina-virtual_8c_a1e0c34cf0b4718ee114dc4d49ff81f25} 
 int minimo (\begin{DoxyParamCaption}\item[{int}]{a}{, }\item[{int}]{b}{}\end{DoxyParamCaption})}
 
-\Hypertarget{maquina-virtual_8c_aa9064b3c7301746214e0e4626ff3ecec}\index{maquina-\/virtual.c@{maquina-\/virtual.c}!mostrarArreglo@{mostrarArreglo}}
+\Hypertarget{maquina-virtual_8c_a91221ab12cb3de7102c7b9cce9729694}\index{maquina-\/virtual.c@{maquina-\/virtual.c}!mostrarArreglo@{mostrarArreglo}}
 \index{mostrarArreglo@{mostrarArreglo}!maquina-\/virtual.c@{maquina-\/virtual.c}}
 \doxysubsubsection{\texorpdfstring{mostrarArreglo()}{mostrarArreglo()}}
-{\footnotesize\ttfamily \label{maquina-virtual_8c_aa9064b3c7301746214e0e4626ff3ecec} 
-void mostrar\+Arreglo (\begin{DoxyParamCaption}\item[{char}]{arr}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{n}{}\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \label{maquina-virtual_8c_a91221ab12cb3de7102c7b9cce9729694} 
+void mostrar\+Arreglo (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{arr}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{n}{}\end{DoxyParamCaption})}
 
 \Hypertarget{maquina-virtual_8c_a5a929a19e9fd592a02098af7fc32453d}\index{maquina-\/virtual.c@{maquina-\/virtual.c}!mv\_add@{mv\_add}}
 \index{mv\_add@{mv\_add}!maquina-\/virtual.c@{maquina-\/virtual.c}}

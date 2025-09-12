@@ -34,6 +34,80 @@
 \DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ AC\_INDEX\ 16}}
 \DoxyCodeLine{00031\ \textcolor{preprocessor}{\#define\ CC\_INDEX\ 17}}
 \DoxyCodeLine{00032\ }
-\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ CANT\_OP\ 32}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ MAX\_STR\_LEN\ 4}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ NOMBRE\_REG[\mbox{\hyperlink{constantes_8h_a8f535716a7773edc566828efb4ea4bea}{TAM\_REGISTROS}}]\ =\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ [0x00]\ =\ \textcolor{stringliteral}{"{}LAR"{}},}
+\DoxyCodeLine{00038\ \ \ \ \ [0x01]\ =\ \textcolor{stringliteral}{"{}MAR"{}},}
+\DoxyCodeLine{00039\ \ \ \ \ [0x02]\ =\ \textcolor{stringliteral}{"{}MBR"{}},}
+\DoxyCodeLine{00040\ \ \ \ \ [0x03]\ =\ \textcolor{stringliteral}{"{}IP"{}},}
+\DoxyCodeLine{00041\ \ \ \ \ [0x04]\ =\ \textcolor{stringliteral}{"{}OPC"{}},}
+\DoxyCodeLine{00042\ \ \ \ \ [0x05]\ =\ \textcolor{stringliteral}{"{}OP1"{}},}
+\DoxyCodeLine{00043\ \ \ \ \ [0x06]\ =\ \textcolor{stringliteral}{"{}OP2"{}},}
+\DoxyCodeLine{00044\ \ \ \ \ [0x07]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00045\ \ \ \ \ [0x08]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00046\ \ \ \ \ [0x09]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00047\ \ \ \ \ [0x0A]\ =\ \textcolor{stringliteral}{"{}EAX"{}},}
+\DoxyCodeLine{00048\ \ \ \ \ [0x0B]\ =\ \textcolor{stringliteral}{"{}EBX"{}},}
+\DoxyCodeLine{00049\ \ \ \ \ [0x0C]\ =\ \textcolor{stringliteral}{"{}ECX"{}},}
+\DoxyCodeLine{00050\ \ \ \ \ [0x0D]\ =\ \textcolor{stringliteral}{"{}EDX"{}},}
+\DoxyCodeLine{00051\ \ \ \ \ [0x0E]\ =\ \textcolor{stringliteral}{"{}EEX"{}},}
+\DoxyCodeLine{00052\ \ \ \ \ [0x0F]\ =\ \textcolor{stringliteral}{"{}EFX"{}},}
+\DoxyCodeLine{00053\ \ \ \ \ [0x10]\ =\ \textcolor{stringliteral}{"{}AC"{}},}
+\DoxyCodeLine{00054\ \ \ \ \ [0x11]\ =\ \textcolor{stringliteral}{"{}CC"{}},}
+\DoxyCodeLine{00055\ \ \ \ \ [0x12]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00056\ \ \ \ \ [0x13]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00057\ \ \ \ \ [0x14]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00058\ \ \ \ \ [0x15]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00059\ \ \ \ \ [0x16]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00060\ \ \ \ \ [0x17]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00061\ \ \ \ \ [0x18]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00062\ \ \ \ \ [0x19]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00063\ \ \ \ \ [0x1A]\ =\ \textcolor{stringliteral}{"{}CS"{}},}
+\DoxyCodeLine{00064\ \ \ \ \ [0x1B]\ =\ \textcolor{stringliteral}{"{}DS"{}},}
+\DoxyCodeLine{00065\ \ \ \ \ [0x1C]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00066\ \ \ \ \ [0x1D]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00067\ \ \ \ \ [0x1E]\ =\ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00068\ \ \ \ \ [0x1F]\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{00069\ \};}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ MNEMONICOS[\mbox{\hyperlink{constantes_8h_a68b78dfb0983bc866860e90905a41c15}{CANT\_OP}}]\ =\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ [0x00]\ =\ \textcolor{stringliteral}{"{}SYS"{}},}
+\DoxyCodeLine{00073\ \ \ \ \ [0x01]\ =\ \textcolor{stringliteral}{"{}JMP"{}},}
+\DoxyCodeLine{00074\ \ \ \ \ [0x02]\ =\ \textcolor{stringliteral}{"{}JZ"{}},}
+\DoxyCodeLine{00075\ \ \ \ \ [0x03]\ =\ \textcolor{stringliteral}{"{}JP"{}},}
+\DoxyCodeLine{00076\ \ \ \ \ [0x04]\ =\ \textcolor{stringliteral}{"{}JN"{}},}
+\DoxyCodeLine{00077\ \ \ \ \ [0x05]\ =\ \textcolor{stringliteral}{"{}JNZ"{}},}
+\DoxyCodeLine{00078\ \ \ \ \ [0x06]\ =\ \textcolor{stringliteral}{"{}JNP"{}},}
+\DoxyCodeLine{00079\ \ \ \ \ [0x07]\ =\ \textcolor{stringliteral}{"{}JNN"{}},}
+\DoxyCodeLine{00080\ \ \ \ \ [0x08]\ =\ \textcolor{stringliteral}{"{}NOT"{}},}
+\DoxyCodeLine{00081\ \ \ \ \ [0x09]\ =\ \textcolor{stringliteral}{"{}"{}},\ \ \ \ \ }
+\DoxyCodeLine{00082\ \ \ \ \ [0x0A]\ =\ \textcolor{stringliteral}{"{}"{}},\ \ \ \ \ }
+\DoxyCodeLine{00083\ \ \ \ \ [0x0B]\ =\ \textcolor{stringliteral}{"{}"{}},\ \ \ \ \ }
+\DoxyCodeLine{00084\ \ \ \ \ [0x0C]\ =\ \textcolor{stringliteral}{"{}"{}},\ \ \ \ \ }
+\DoxyCodeLine{00085\ \ \ \ \ [0x0D]\ =\ \textcolor{stringliteral}{"{}"{}},\ \ \ \ \ }
+\DoxyCodeLine{00086\ \ \ \ \ [0x0E]\ =\ \textcolor{stringliteral}{"{}"{}},\ \ \ \ \ }
+\DoxyCodeLine{00087\ \ \ \ \ [0x0F]\ =\ \textcolor{stringliteral}{"{}STOP"{}},}
+\DoxyCodeLine{00088\ \ \ \ \ [0x10]\ =\ \textcolor{stringliteral}{"{}MOV"{}},}
+\DoxyCodeLine{00089\ \ \ \ \ [0x11]\ =\ \textcolor{stringliteral}{"{}ADD"{}},}
+\DoxyCodeLine{00090\ \ \ \ \ [0x12]\ =\ \textcolor{stringliteral}{"{}SUB"{}},}
+\DoxyCodeLine{00091\ \ \ \ \ [0x13]\ =\ \textcolor{stringliteral}{"{}MUL"{}},}
+\DoxyCodeLine{00092\ \ \ \ \ [0x14]\ =\ \textcolor{stringliteral}{"{}DIV"{}},}
+\DoxyCodeLine{00093\ \ \ \ \ [0x15]\ =\ \textcolor{stringliteral}{"{}CMP"{}},}
+\DoxyCodeLine{00094\ \ \ \ \ [0x16]\ =\ \textcolor{stringliteral}{"{}SHL"{}},}
+\DoxyCodeLine{00095\ \ \ \ \ [0x17]\ =\ \textcolor{stringliteral}{"{}SHR"{}},}
+\DoxyCodeLine{00096\ \ \ \ \ [0x18]\ =\ \textcolor{stringliteral}{"{}SAR"{}},}
+\DoxyCodeLine{00097\ \ \ \ \ [0x19]\ =\ \textcolor{stringliteral}{"{}AND"{}},}
+\DoxyCodeLine{00098\ \ \ \ \ [0x1A]\ =\ \textcolor{stringliteral}{"{}OR"{}},}
+\DoxyCodeLine{00099\ \ \ \ \ [0x1B]\ =\ \textcolor{stringliteral}{"{}XOR"{}},}
+\DoxyCodeLine{00100\ \ \ \ \ [0x1C]\ =\ \textcolor{stringliteral}{"{}SWAP"{}},}
+\DoxyCodeLine{00101\ \ \ \ \ [0x1D]\ =\ \textcolor{stringliteral}{"{}LDL"{}},}
+\DoxyCodeLine{00102\ \ \ \ \ [0x1E]\ =\ \textcolor{stringliteral}{"{}LDH"{}},}
+\DoxyCodeLine{00103\ \ \ \ \ [0x1F]\ =\ \textcolor{stringliteral}{"{}RND"{}}}
+\DoxyCodeLine{00104\ \};}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

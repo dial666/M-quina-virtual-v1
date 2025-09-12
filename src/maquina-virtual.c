@@ -7,11 +7,12 @@
 #include "mem_reg_io.h"
 #include "constantes.h"
 #include "utils.h"
+#include "disassembler.h"
 
 typedef void (*ArrayOperaciones[32])(char[], int[], int[]);
 
 int verificarNumOperacion(char primer_byte);
-void mostrarArreglo(char arr[], int n);
+void mostrarArreglo(char* arr[], int n);
 void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]);
 int mascara0primerosBits(int cantBits);
 
@@ -19,7 +20,7 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos
 void convertirArregloAInt(char arregloBytes[], int n, int *num);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
 void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]);
-void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones);
+void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones, int disassembler);
 
 void mv_mov(char memoria[], int registros[], int tablaSegmentos[]);
 void mv_add(char memoria[], int registros[], int tablaSegmentos[]);
@@ -56,6 +57,8 @@ int main(int argc, char *argv[]) {
 
     ArrayOperaciones operaciones;//array de funciones
 
+    int disassembler;
+
     operaciones[0x00] = &mv_sys;
     operaciones[0x01] = &mv_jmp;
     operaciones[0x02] = &mv_jz;
@@ -90,8 +93,9 @@ int main(int argc, char *argv[]) {
     operaciones[0x1F] = &mv_rnd;
 
     leerArchivoEntrada(argv[1], memoria, tablasegmentos, registros);
-    //ejecutarPrograma(memoria, registros, tablasegmentos);
-    ejecutarPrograma(memoria, registros, tablasegmentos, operaciones);
+    disassembler = argc==3 && strcmp(argv[2], "-d")==0;
+    printf("disassembler: %d\n", disassembler);
+    ejecutarPrograma(memoria, registros, tablasegmentos, operaciones, disassembler);
 
     return 0;
 }
@@ -184,8 +188,7 @@ void fetchInstruccion(char memoria[], int registros[], int tablaSegmentos[]){
     fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX], 1);
 }
 
-
-void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[]){ //IP todavia apunta a inicio de instruccion
+void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[], int disassembler){ //IP todavia apunta a inicio de instruccion
     int instruccion = registros[MBR_INDEX];
     //printf("MBR: %X\n", registros[MBR_INDEX]);
     int tipo1 = (instruccion >> 6) /*(y como es SAR:)*/ & 0b11;
@@ -205,18 +208,20 @@ void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[]){ /
         registros[OP2_INDEX] = registros[MBR_INDEX];
     }
 
-
+    //acá iría el disassemler
     registros[OP1_INDEX] &= 0x00FFFFFF;
     registros[OP2_INDEX] &= 0x00FFFFFF;
 
     registros[OP1_INDEX] |= (tipo1 << 24);
     registros[OP2_INDEX] |= (tipo2 << 24);
-
+    //printf("OP1: %X ", registros[OP1_INDEX]);
+    //printf("OP2: %X ", registros[OP2_INDEX]);
+    if (disassembler)
+        mostrarDisassembler(instruccion, tipo1, tipo2, registros);
+    
     if(tipo2!=0)
         intercambiarVar(&registros[OP1_INDEX], &registros[OP2_INDEX]);
 
-    //printf("OP1: %X ", registros[OP1_INDEX]);
-    //printf("OP2: %X ", registros[OP2_INDEX]);
 
     //printf("IP: %d ", registros[IP_INDEX]);
     registros[IP_INDEX] += 1 + tipo1 + tipo2;    
@@ -240,10 +245,10 @@ void convertirArregloAInt(char arregloBytes[], int n, int *num) {
 }
 
 
-void mostrarArreglo(char arr[], int n) {
+void mostrarArreglo(char* arr[], int n) {
     int i = 0;
     for (; i < n; i++)
-        printf("%d\n", arr[i]);
+        printf("%s\n", arr[i]);
 }
 
 void actualizarCC(int registros[], int valor){ //primer bit N, segundo Z
@@ -632,11 +637,11 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
     terminarPrograma("codigo de operacion invalido");
 };
 
-void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones) {
+void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones, int disassembler) {
     //ciclo real
     while(registros[IP_INDEX] != -1){
         fetchInstruccion(memoria, registros, tablaSegmentos);
-        decodeInstruccion(memoria, registros, tablaSegmentos);
+        decodeInstruccion(memoria, registros, tablaSegmentos, disassembler);
         operaciones[registros[OPC_INDEX]](memoria, registros, tablaSegmentos);
     }
 }

@@ -2,6 +2,7 @@ var constantes_8h =
 [
     [ "AC_INDEX", "constantes_8h.html#a8ea9f242d982ffb4e8cb4c96abea5fa2", null ],
     [ "CANT_BYTES_TAM_CODIGO", "constantes_8h.html#a6af28c8c385175ccefb8f7d4d1a84f59", null ],
+    [ "CANT_OP", "constantes_8h.html#a68b78dfb0983bc866860e90905a41c15", null ],
     [ "CC_INDEX", "constantes_8h.html#a2daab1687811f2eef90c2c9980ef4428", null ],
     [ "CS_INDEX", "constantes_8h.html#afcb9f3b388e4f91f82cf7bd9d995e16c", null ],
     [ "CS_SEG_INDEX", "constantes_8h.html#a47bbda127656c7626363d56758edab7c", null ],
@@ -16,6 +17,7 @@ var constantes_8h =
     [ "IP_INDEX", "constantes_8h.html#ad619a2ccaa25eeff5f4cace25452e690", null ],
     [ "LAR_INDEX", "constantes_8h.html#aade4bad517354407e48a3b6dab7cc2ce", null ],
     [ "MAR_INDEX", "constantes_8h.html#a7395c4b11296f92adf541ad0e47a4ff8", null ],
+    [ "MAX_STR_LEN", "constantes_8h.html#a58ce36916c399104e18d32ff090f21c6", null ],
     [ "MBR_INDEX", "constantes_8h.html#a3f0559e201686ec82089a5ba56f1427a", null ],
     [ "OP1_INDEX", "constantes_8h.html#a2ee7cec90b5c2c4d7dd93b45c2b84661", null ],
     [ "OP2_INDEX", "constantes_8h.html#a4a8fce76b8019a1b5c464efd6d072d3b", null ],

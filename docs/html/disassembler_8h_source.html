@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.14.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Máquina virtual v1: src Directory Reference</title>
+<title>Máquina virtual v1: include/disassembler.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('dir_68267d1309a1af8e8297ef4c3efbcdba.html','',''); });
+$(function(){initNavTree('disassembler_8h_source.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -89,31 +89,27 @@ $(function(){initNavTree('dir_68267d1309a1af8e8297ef4c3efbcdba.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">src Directory Reference</div></div>
+  <div class="headertitle"><div class="title">disassembler.h</div></div>
 </div><!--header-->
 <div class="contents">
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-files" class="groupheader"><a id="files" name="files"></a>
-Files</h2></td></tr>
-<tr class="memitem:disassembler_2Ec" id="r_disassembler_2Ec"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"><div class="doc-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="disassembler_8c.html">disassembler.c</a></td></tr>
-<tr class="memitem:maquina-virtual_2Ec" id="r_maquina-virtual_2Ec"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"><div class="doc-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="maquina-virtual_8c.html">maquina-virtual.c</a></td></tr>
-<tr class="memitem:mem_5Freg_5Fio_2Ec" id="r_mem_5Freg_5Fio_2Ec"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"><div class="doc-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mem__reg__io_8c.html">mem_reg_io.c</a></td></tr>
-<tr class="memitem:utils_2Ec" id="r_utils_2Ec"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"><div class="doc-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8c.html">utils.c</a></td></tr>
-</table>
-</div><!-- contents -->
+<a href="disassembler_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef DISASSEMBLER_H</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define DISASSEMBLER_H</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keywordtype">void</span> <a class="code hl_function" href="disassembler_8h.html#ab2a27f57128e8e5c3c3a099db15a84ca">mostrarValorEnHexa</a>(<span class="keywordtype">int</span> valor, <span class="keywordtype">int</span> n);</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keywordtype">void</span> <a class="code hl_function" href="disassembler_8h.html#a484dd0312f6ff84a65b6861f996198e5">mostrarOperando</a>(<span class="keywordtype">int</span> operando, <span class="keywordtype">int</span> <a class="code hl_function" href="utils_8h.html#a46ca3466bf244419d6af64f5335349e1">tipoOperando</a>);</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keywordtype">void</span> <a class="code hl_function" href="disassembler_8h.html#a5a4882895ef94d203dd0ac67569b4eee">mostrarDisassembler</a>(<span class="keywordtype">int</span> instruccion, <span class="keywordtype">int</span> tipo1, <span class="keywordtype">int</span> tipo2, <span class="keywordtype">int</span> registros[]);</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="adisassembler_8h_html_a484dd0312f6ff84a65b6861f996198e5"><div class="ttname"><a href="disassembler_8h.html#a484dd0312f6ff84a65b6861f996198e5">mostrarOperando</a></div><div class="ttdeci">void mostrarOperando(int operando, int tipoOperando)</div><div class="ttdef"><b>Definition</b> disassembler.c:11</div></div>
+<div class="ttc" id="adisassembler_8h_html_a5a4882895ef94d203dd0ac67569b4eee"><div class="ttname"><a href="disassembler_8h.html#a5a4882895ef94d203dd0ac67569b4eee">mostrarDisassembler</a></div><div class="ttdeci">void mostrarDisassembler(int instruccion, int tipo1, int tipo2, int registros[])</div><div class="ttdef"><b>Definition</b> disassembler.c:25</div></div>
+<div class="ttc" id="adisassembler_8h_html_ab2a27f57128e8e5c3c3a099db15a84ca"><div class="ttname"><a href="disassembler_8h.html#ab2a27f57128e8e5c3c3a099db15a84ca">mostrarValorEnHexa</a></div><div class="ttdeci">void mostrarValorEnHexa(int valor, int n)</div><div class="ttdef"><b>Definition</b> disassembler.c:5</div></div>
+<div class="ttc" id="autils_8h_html_a46ca3466bf244419d6af64f5335349e1"><div class="ttname"><a href="utils_8h.html#a46ca3466bf244419d6af64f5335349e1">tipoOperando</a></div><div class="ttdeci">int tipoOperando(int operando)</div><div class="ttdef"><b>Definition</b> utils.c:10</div></div>
+</div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div id="page-nav" class="page-nav-panel">
-<div id="page-nav-resize-handle"></div>
-<div id="page-nav-tree">
-<div id="page-nav-contents">
-</div><!-- page-nav-contents -->
-</div><!-- page-nav-tree -->
-</div><!-- page-nav -->
 </div><!-- container -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>
+    <li class="navelem"><a href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a href="disassembler_8h.html">disassembler.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0 </li>
   </ul>
 </div>
