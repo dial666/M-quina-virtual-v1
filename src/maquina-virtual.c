@@ -14,13 +14,11 @@ int verificarNumOperacion(char primer_byte);
 void mostrarArreglo(char arr[], int n);
 void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]);
 int mascara0primerosBits(int cantBits);
-int tipoOperando(int operando);
 
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]);
 void convertirArregloAInt(char arregloBytes[], int n, int *num);
 void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
 void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]);
-void fetch(char memoria[], int registros[], int tablaSegmentos[], int dirLogica, int cantBytes);
 void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones);
 
 void mv_mov(char memoria[], int registros[], int tablaSegmentos[]);
@@ -186,11 +184,6 @@ void fetchInstruccion(char memoria[], int registros[], int tablaSegmentos[]){
     fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX], 1);
 }
 
-void fetch(char memoria[], int registros[], int tablaSegmentos[], int dirLogica, int cantBytes){
-    cargarLAR(dirLogica, registros);
-    cargarMAR(cantBytes, registros, tablaSegmentos);
-    leerMemoria(memoria, registros);
-}
 
 void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[]){ //IP todavia apunta a inicio de instruccion
     int instruccion = registros[MBR_INDEX];
@@ -251,27 +244,6 @@ void mostrarArreglo(char arr[], int n) {
     int i = 0;
     for (; i < n; i++)
         printf("%d\n", arr[i]);
-}
-
-int OperandotoInmediato(int operando, char memoria[], int registros[], int tablaSegmentos[]){
-    int tipo = tipoOperando(operando);
-    int valor = (operando << 8) >> 8;
-    ////printf("tipo: %X valor:%X\n", tipo, valor);
-    if(tipo == 2)
-        return valor;
-    else if (tipo == 01)
-        return registros[valor]; //no contempla registro inexistente
-    else if(tipo == 3){
-        int registro = (valor >> 16) & 0x1F;
-        int offset = (valor << 16) >> 16;
-        ////printf("registro: %X offset:%X\n", registro, offset);
-        int dirLogica = registros[registro] + offset;
-        fetch(memoria, registros, tablaSegmentos, dirLogica, 4);
-        return registros[MBR_INDEX];
-    }
-    else
-        terminarPrograma("Un operando de tipo ninguno no puede convertirse a un inmediato");
-
 }
 
 void actualizarCC(int registros[], int valor){ //primer bit N, segundo Z
@@ -653,10 +625,6 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
 
 int mascara0primerosBits(int cantBits){
     return cantBits < 32 ? (1U << (32 - cantBits)) - 1 : 0;
-}
-
-int tipoOperando(int operando){
-    return (operando >> 24) & (0x00000003);
 }
 
 void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones) {
