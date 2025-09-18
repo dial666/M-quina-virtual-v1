@@ -94,6 +94,7 @@ int main(int argc, char *argv[]) {
 
     leerArchivoEntrada(argv[1], memoria, tablasegmentos, registros);
     disassembler = argc==3 && strcmp(argv[2], "-d")==0;
+    srand(time(NULL));
     ejecutarPrograma(memoria, registros, tablasegmentos, operaciones, disassembler);
 
     return 0;
@@ -422,10 +423,10 @@ void mv_rnd(char memoria[], int registros[], int tablaSegmentos[]){//genera solo
     
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], aleatorio);
 
-    /* printf("B:%d, A RAND B:0x%08X\n", B, aleatorio);
-    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
+    // printf("B:%d, A RAND B:0x%08X\n", B, aleatorio);
+    // printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
 
-    printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]);  */
+    // printf("CC: 0x%08X, AC:%d\n", registros[CC_INDEX], registros[AC_INDEX]); 
 }
 
 void jump(char memoria[], int registros[], int tablaSegmentos[], int operando){
