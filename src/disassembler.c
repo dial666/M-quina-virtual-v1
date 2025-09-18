@@ -2,6 +2,12 @@
 #include "constantes.h"
 #include "disassembler.h"
 
+void imprimirEspacios(int cantEspacios) {
+    int i;
+    for (i=0; i<cantEspacios; i++)
+        printf("   ");
+}
+
 void mostrarValorEnHexa(int valor, int n) {
     int i;
     for (i=0; i<n; i++)
@@ -10,15 +16,15 @@ void mostrarValorEnHexa(int valor, int n) {
 
 void mostrarOperando(int operando, int tipoOperando) {
     if (tipoOperando==1)
-        printf("%s  ", NOMBRE_REG[operando & 0x1F]);
+        printf("%s", NOMBRE_REG[operando & 0x1F]);
     else
         if (tipoOperando==2)
-            printf("%d  ", (operando << 16) >> 16);
+            printf("%d", (operando << 16) >> 16);
         else
             if (tipoOperando==3) {
                 printf("[%s", NOMBRE_REG[(operando >> 16) & 0x1F]);
                 int offset = (operando << 16) >> 16;
-                (offset>=0)? printf("+%d]  ", offset): printf("%d]  ", offset);
+                (offset>=0)? printf("+%d]", offset): printf("%d]", offset);
             }
 }
 
@@ -27,6 +33,7 @@ void mostrarDisassembler(int instruccion, int tipo1, int tipo2, int registros[])
     mostrarValorEnHexa(instruccion, 1);
     mostrarValorEnHexa(registros[OP1_INDEX], tipo1);
     mostrarValorEnHexa(registros[OP2_INDEX], tipo2);
+    imprimirEspacios(7-tipo1-tipo2);
     printf("| %s  ", MNEMONICOS[registros[OPC_INDEX]]);
     if (tipo2!=0) {
         mostrarOperando(registros[OP2_INDEX], tipo2);
