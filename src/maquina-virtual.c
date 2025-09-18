@@ -102,7 +102,8 @@ int main(int argc, char *argv[]) {
 void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]) {
     FILE *archBin;
     int tamCodigo; //variable auxiliar para leer cada dos bytes
-    char lineaCodigo, tamCodigoAux[CANT_BYTES_TAM_CODIGO], aux;
+    char lineaCodigo;
+    unsigned char aux;;
     int i;
 
 
@@ -113,15 +114,14 @@ void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos
         //leer tamaño de codigo del archivo
         fseek(archBin, 6, SEEK_SET);
         i = 0;
+        tamCodigo = 0;
         while (i < CANT_BYTES_TAM_CODIGO && fread(&aux, sizeof(aux), 1, archBin) == 1) {
-            tamCodigoAux[i] = aux;
+            tamCodigo = tamCodigo | (aux << ((CANT_BYTES_TAM_CODIGO-1-i)*8));
             i++;
         }
 
         if (i != CANT_BYTES_TAM_CODIGO)
-            terminarPrograma("no se pudo leer el tamano de codigo");
-            
-        convertirArregloAInt(tamCodigoAux, CANT_BYTES_TAM_CODIGO, &tamCodigo);
+            terminarPrograma("no se pudo leer el tamano de codigo");  
 
         if (tamCodigo > TAM_MEMORIA)
             terminarPrograma("el tamamo del codigo supera al de la memoria");
@@ -229,20 +229,6 @@ void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[], in
 
 
 }
-
-void convertirArregloAInt(char arregloBytes[], int n, int *num) {
-    int i, aux;
-    int cantBytesDesplazar = n - 1;
-
-    *num = 0;
-    for(i = 0; i < n; i++) {
-        aux = arregloBytes[i];
-        aux = aux << (cantBytesDesplazar * 8);
-        *num = *num | aux;
-        cantBytesDesplazar--;
-    }
-}
-
 
 void mostrarArreglo(char* arr[], int n) {
     int i = 0;
@@ -568,7 +554,6 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
     int cantCeldas = registros[ECX_INDEX] & 0xFFFF;
     int tamanioCelda = (registros[ECX_INDEX]>>16) & 0xFFFF;
     int dirLogica = registros[EDX_INDEX];                     
-    
     int modo = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     
     if(tamanioCelda < 1 || tamanioCelda > 4)  //solo puede escribir celdas de 1 a 4 bytes (MBR es de 32 bits)
@@ -580,7 +565,7 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
             terminarPrograma("segmentatio fault, no puede escribir o leer datos fuera del DS");
         cargarLAR(dirLogica, registros);
         cargarMAR(tamanioCelda, registros, tablaSegmentos);
-        printf("[%X]: ", registros[MAR_INDEX]&0xFFFF);
+        printf("[%04X]: ", registros[MAR_INDEX]&0xFFFF);
         if(modo == 1){ //READ (escribe en memoria lo leido en consola)
             scanf("%199s", cadenaConsola);
             registros[MBR_INDEX] = cadenaToInmediato(cadenaConsola, formato);
@@ -588,7 +573,6 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
 
         }else if(modo == 2){// WRITE (escribe en consola)
             leerMemoria(memoria, registros);
-            
             printf("%s\n", inmediatoToString(registros[MBR_INDEX], formato));
         }else
             terminarPrograma("operando invalido para instruccion sys");

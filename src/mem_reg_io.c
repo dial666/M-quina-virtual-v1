@@ -271,7 +271,7 @@ int OperandotoInmediato(int operando, char memoria[], int registros[], int tabla
  * @param memoria 
  * @param registros 
  * @param tablaSegmentos 
- * @param dirLogica Dirección lógica derivada de un operando de memoria.
+ * @param dirLogica Dirección lógica derivada de un operando de memoria o de la IP.
  * @param cantBytes Cantidad de bytes/celdas a leer de memoria.
  */
 void fetch(char memoria[], int registros[], int tablaSegmentos[], int dirLogica, int cantBytes){
