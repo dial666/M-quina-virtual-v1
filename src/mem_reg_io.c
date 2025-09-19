@@ -67,6 +67,9 @@ void cargarMAR(int cantBytes, int registros[], int tablaSegmentos[]){
 
 }
 
+//hay que chequear que el offset de la direccion logica contenida en un
+//registro sumado al offset del operando de memoria no supere los dos bytes?
+
 /**
  * @brief Pone en MBR un valor leído de memoria.
  * 
@@ -183,15 +186,8 @@ void verificarIndiceRegistro(int indexReg) {
  * Extrae el tipo de operando y el resto de los datos (registro, offset) del
  * operando.
  * Realiza distintas instrucciones de escritura de acuerdo al tipo de operando.
- * Si es de memoria, controla que la suma del offset de la dirección lógica en el 
- * registro indicado por el operando y el offset del operando no superen los 2
- * bytes.
- * Esto es para que no ocurra un overflow y se "contamine" el puntero a la
- * dirección del segmento en la dirección lógica.
- * De no cumplirse esta condición, se termina el programa.
- * Si se cumple, se arma la nueva dirección lógica y se invoca a store(). 
- * 
- * @warning Quizás sea mejor hacer dicha validación en su propia función.
+ * Si es de memoria, se arma la nueva dirección lógica y se invoca a store(). 
+
  * 
  * @param memoria 
  * @param registros 
@@ -215,13 +211,7 @@ void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos
         int reg = (valor_logico >> 16) & 0x1F;
         verificarIndiceRegistro(reg);
         int offset = (valor_logico << 16) >> 16;
-        int base = registros[reg];
-        int seg = (base >> 16) & 0xFFFF;
-        int baseOff = base & 0xFFFF;
-        int nuevoOff = baseOff + offset;
-        if (nuevoOff < 0 || nuevoOff > 0xFFFF)
-            terminarPrograma("segmentation fault: offset fuera de rango");
-        int dirLog = (seg << 16) | (nuevoOff & 0xFFFF);
+        int dirLog = registros[reg] + offset;
         store(memoria, registros, tablaSegmentos, dirLog, 4, valor);
     }
     else
@@ -231,8 +221,6 @@ void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos
 /**
  * @brief Obtiene el valor de un operando.
  * 
- * @warning Cuando el operando es de memoria, no verifica que no haya overflow con
- * el offset, algo que sí se hace en escribirMemoriaRegistro().
  * @see escribirMemoriaRegistro().
  * 
  * @param operando Valor en OP1 u OP2.
@@ -256,7 +244,7 @@ int OperandotoInmediato(int operando, char memoria[], int registros[], int tabla
         verificarIndiceRegistro(registro);
         int offset = (valor << 16) >> 16;
         ////printf("registro: %X offset:%X\n", registro, offset);
-        int dirLogica = registros[registro] + offset;
+        int dirLogica = registros[registro]+ offset;
         fetch(memoria, registros, tablaSegmentos, dirLogica, 4);
         return registros[MBR_INDEX];
     }
@@ -278,4 +266,4 @@ void fetch(char memoria[], int registros[], int tablaSegmentos[], int dirLogica,
     cargarLAR(dirLogica, registros);
     cargarMAR(cantBytes, registros, tablaSegmentos);
     leerMemoria(memoria, registros);
-}
+} 
