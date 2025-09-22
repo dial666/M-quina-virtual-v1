@@ -503,12 +503,12 @@ int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 b
             terminarPrograma("formato de escritura a memoria erroneo");
     }
 
-    int mask = 1;
-    mask = mask << (bits-1);
-    if (inmediato & mask) {
-        inmediato = inmediato << (32-bits);
-        inmediato = inmediato >> (32-bits);
-    }
+    // int mask = 1;
+    // mask = mask << (bits-1);
+    // if (inmediato & mask) {
+    //     inmediato = inmediato << (32-bits);
+    //     inmediato = inmediato >> (32-bits);
+    // }
     return inmediato;
 }
 
