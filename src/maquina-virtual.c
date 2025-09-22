@@ -476,6 +476,7 @@ int minimo(int a, int b){
 int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 bits 
     //PRECONDICION: el string debe significar un inmediato de igual o menos que 4 bytes
     int inmediato=0;
+    int bits;
     int largo = minimo(strlen(cadena), 4);
     switch(formato){
         case 0x1: //decimal
@@ -487,17 +488,28 @@ int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 b
             return inmediato;
             break;
         case 0x4: //octal
-            return (int) strtol(cadena, NULL, 8);
+            inmediato =  (int) strtol(cadena, NULL, 8);
+            bits = strlen(cadena) * 3;
             break;
         case 0x8: //hexadecimal
-            return (int) strtol(cadena, NULL, 16);
+            inmediato =  (int) strtol(cadena, NULL, 16);
+            bits = strlen(cadena) * 4;
             break;
         case 0x10: //binario
-            return (int) strtol(cadena, NULL, 2);
+            inmediato = (int) strtol(cadena, NULL, 2);
+            bits = strlen(cadena);
             break;
         default:
             terminarPrograma("formato de escritura a memoria erroneo");
     }
+
+    int mask = 1;
+    mask = mask << (bits-1);
+    if (inmediato & mask) {
+        inmediato = inmediato << (32-bits);
+        inmediato = inmediato >> (32-bits);
+    }
+    return inmediato;
 }
 
 char* inmediatoToString(int inmediato, int formato){//
@@ -537,11 +549,25 @@ char* inmediatoToString(int inmediato, int formato){//
         primero = 0;
     }
     if (formato & 0x10) { // binario
-        char binario[33] = {0};
-        for (int i = 31; i >= 0; i--) {
-            binario[31 - i] = (inmediato & (1 << i)) ? '1' : '0';
+        char binario[33];
+        int pos = 0;
+        unsigned int n = inmediato;
+
+        if (n == 0) {
+            binario[pos++] = '0';
+        } else {
+            while (n > 0) {
+                binario[pos++] = (n & 1) ? '1' : '0';
+                n >>= 1;
+            }
+            // invertir la cadena porque quedó al revés
+            for (int i = 0; i < pos / 2; i++) {
+                char tmp = binario[i];
+                binario[i] = binario[pos - 1 - i];
+                binario[pos - 1 - i] = tmp;
+            }
         }
-        binario[32] = '\0';
+        binario[pos] = '\0';
         snprintf(temp, sizeof(temp), "0b%s", binario);
         if (!primero) strcat(cadena, " ");
         strcat(cadena, temp);
