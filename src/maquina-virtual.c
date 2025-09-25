@@ -12,7 +12,7 @@
 typedef void (*ArrayOperaciones[32])(char[], int[], int[]);
 
 int verificarNumOperacion(char primer_byte);
-void mostrarArreglo(char* arr[], int n);
+//void mostrarArreglo(char* arr[], int n);
 void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]);
 int mascara0primerosBits(int cantBits);
 
@@ -182,7 +182,13 @@ int verificarNumOperacion(char primer_byte){ //parametro = primer byte de instru
     return (primer_byte <= 0x1F) && !(primer_byte > 0x08 && primer_byte < 0x0F);
 }
 
-
+void mostrarArreglo(char memoria[],int principio, int n)
+{
+    for (int i = principio; i < n; i++)
+    {
+        printf("[%04d]: %02x\n", i-0xfe, memoria[i]);
+    }
+}
 
 void fetchInstruccion(char memoria[], int registros[], int tablaSegmentos[]){
     fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX], 1);
@@ -231,11 +237,11 @@ void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[], in
 
 }
 
-void mostrarArreglo(char* arr[], int n) {
+/* void mostrarArreglo(char* arr[], int n) {
     int i = 0;
     for (; i < n; i++)
         printf("%s\n", arr[i]);
-}
+} */
 
 void actualizarCC(int registros[], int valor){ //primer bit N, segundo Z
     registros[CC_INDEX] &= 0x3FFFFFFF; //setea en 0 primeros dos bits pero deja el resto con el valor que tuvieran
@@ -263,18 +269,20 @@ void mv_add(char memoria[], int registros[], int tablaSegmentos[]){
     actualizarCC(registros, A+B);
 
     //pruebas 
-    /* printf("A:%d, B:%d, A+B:%d\n", A, B, A+B);
-    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos)); */
+   // printf("A:%d, B:%d, A+B:%x\n", A, B, A+B);
+    //printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos));
 }
 void mv_sub(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
+     //mostrarArreglo(memoria, 254, 280);
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A-B);
     actualizarCC(registros, A-B);
 
-    /* //pruebas:
-    printf("A:%d, B:%d, A-B:%d\n", A, B, A-B);
-    printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos)); */    
+    //pruebas:
+    //printf("A:%d, B:%d, A-B:%d\n", A, B, A-B);
+    //mostrarArreglo(memoria, 254, 280);
+   // printf("Operando: 0x%X, valor:%d\n", registros[OP1_INDEX], OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos)); */    
 }
 void mv_mul(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
@@ -368,7 +376,6 @@ void mv_or(char memoria[], int registros[], int tablaSegmentos[]){
 void mv_xor(char memoria[], int registros[], int tablaSegmentos[]){
     int A = OperandotoInmediato(registros[OP1_INDEX], memoria, registros, tablaSegmentos);
     int B = OperandotoInmediato(registros[OP2_INDEX], memoria, registros, tablaSegmentos);
-    
     escribirMemoriaRegistro(memoria, registros, tablaSegmentos, registros[OP1_INDEX], A^B);
     actualizarCC(registros, A^B);
 }

@@ -89,7 +89,7 @@ void cargarMAR(int cantBytes, int registros[], int tablaSegmentos[]){
 void leerMemoria(char memoria[], int registros[]){
     
     int cantBytes = registros[MAR_INDEX] >> 16;
-    int direccion = registros[MAR_INDEX] & 0x00FF;
+    int direccion = registros[MAR_INDEX] & 0x0000FFFF;
     //printf("MAR: %X memoria[%d]: %X\n", registros[MAR_INDEX], direccion, memoria[direccion]);
 
     int valor = 0;
@@ -97,11 +97,11 @@ void leerMemoria(char memoria[], int registros[]){
         valor = (valor << 8) | (memoria[direccion + i] & 0x000000FF);  // no mantiene signo de valor leido
         //printf("valor %X i: %d\n", valor, i);
     }
-
+    //printf("valor: %x\n", valor);
     valor = valor << (32 - 8*cantBytes);  //restora signo
     valor = valor >> (32 - 8*cantBytes);
     registros[MBR_INDEX] = valor;
-    //printf("MBR dsp: %X\n", registros[MBR_INDEX]);
+    //printf(" Leer memoria: MBR: %X, direccion: %X\n", registros[MBR_INDEX], direccion);
     
 }
 
@@ -144,7 +144,7 @@ void escribirMemoria(char memoria[], int registros[], int tablaSegmentos[]){
 
     int valor = registros[MBR_INDEX];
 
-    //printf("cantBytes: %X direccion:%X valor:%X\n", cantBytes, direccion, valor);
+    //printf("cantBytes: %X direccion:%X valor:%d\n", cantBytes, direccion, valor);
     for(int i = 1; i <= cantBytes; i++)
         memoria[direccion + cantBytes - i] = (valor << (32-i*8)) >> 24; //shiftea el byte que quiero escribir hasta el byte mas significativo y luego lo shiftea hasta el byte menos significativo
         //creo que el char trunca y toma el byte menos significativo del int, asi que tambien podria ser:
@@ -243,9 +243,11 @@ int OperandotoInmediato(int operando, char memoria[], int registros[], int tabla
         int registro = (valor >> 16) & 0x1F;
         verificarIndiceRegistro(registro);
         int offset = (valor << 16) >> 16;
-        ////printf("registro: %X offset:%X\n", registro, offset);
+       // printf("registro: %X offset:%X\n", registro, offset);
         int dirLogica = registros[registro]+ offset;
+        //printf("dir logica: %x\n", dirLogica);
         fetch(memoria, registros, tablaSegmentos, dirLogica, 4);
+        //printf("operandoToinmediato mbr: %x\n", registros[MBR_INDEX]);
         return registros[MBR_INDEX];
     }
     else
