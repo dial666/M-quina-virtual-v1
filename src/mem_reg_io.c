@@ -30,6 +30,22 @@ void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]) {
         terminarPrograma("se intentó acceder a un bloque de memoria inexistente");
 }
 
+int conseguirDirFisica(int dirLogica, int cantBytes, int tablaSegmentos[]) {
+    int offset = dirLogica & 0x0000FFFF;
+    int segmentIndex = dirLogica >> 16;
+
+    verificarIndiceSegmento(segmentIndex, tablaSegmentos);
+
+    int dirBase = tablaSegmentos[segmentIndex] >> 16 & 0x0000FFFF; //aplicamos mascara por si empieza con bit 1 la direccion fisica del inicio del segmento
+    int tamanioSegmento = tablaSegmentos[segmentIndex] & 0x0000FFFF;
+
+    int dirFisica = dirBase + offset;
+    if( (dirBase <= dirFisica) && ( (dirBase + tamanioSegmento) >= (dirFisica + cantBytes) ) )
+        return dirFisica;
+    else
+        terminarPrograma("segmentation fault");
+}
+
 /**
  * @brief Pone en el MAR los datos necesarios o termina el porgrama si son incorrectos.
  * 
@@ -49,7 +65,7 @@ void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]) {
  */
 void cargarMAR(int cantBytes, int registros[], int tablaSegmentos[]){
     int dirLogica = registros[LAR_INDEX];
-    int offset = dirLogica & 0x0000FFFF;
+    /*int offset = dirLogica & 0x0000FFFF;
     int segmentIndex = dirLogica >> 16;
 
     verificarIndiceSegmento(segmentIndex, tablaSegmentos);
@@ -58,12 +74,12 @@ void cargarMAR(int cantBytes, int registros[], int tablaSegmentos[]){
     int tamanioSegmento = tablaSegmentos[segmentIndex] & 0x0000FFFF;
 
     int dirFisica = dirBase + offset;
-    if( (dirBase <= dirFisica) && ( (dirBase + tamanioSegmento) >= (dirFisica + cantBytes) ) ){
-        registros[MAR_INDEX] = (cantBytes << 16) | ((dirFisica) & (0x0000FFFF)); //CREO QUE EL ULTIMO & ESTA DE MAS PERO REVISAR
+    if( (dirBase <= dirFisica) && ( (dirBase + tamanioSegmento) >= (dirFisica + cantBytes) ) ){ */
+        registros[MAR_INDEX] = (cantBytes << 16) | ((/* dirFisica */conseguirDirFisica(dirLogica, cantBytes, tablaSegmentos)) & (0x0000FFFF)); //CREO QUE EL ULTIMO & ESTA DE MAS PERO REVISAR
         //printf("cantBytes: %X MAR2: %X\n",cantBytes, registros[MAR_INDEX]);
-    }
+    /* }
     else
-        terminarPrograma("segmentation fault");
+        terminarPrograma("segmentation fault"); */
 
 }
 
@@ -143,7 +159,6 @@ void escribirMemoria(char memoria[], int registros[], int tablaSegmentos[]){
     int direccion = registros[MAR_INDEX] & 0x0000FFFF;
 
     int valor = registros[MBR_INDEX];
-
     //printf("cantBytes: %X direccion:%X valor:%d\n", cantBytes, direccion, valor);
     for(int i = 1; i <= cantBytes; i++)
         memoria[direccion + cantBytes - i] = (valor << (32-i*8)) >> 24; //shiftea el byte que quiero escribir hasta el byte mas significativo y luego lo shiftea hasta el byte menos significativo

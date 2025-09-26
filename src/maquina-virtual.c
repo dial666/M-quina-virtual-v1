@@ -194,8 +194,22 @@ void fetchInstruccion(char memoria[], int registros[], int tablaSegmentos[]){
     fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX], 1);
 }
 
+int leerInstruccionOperando(char memoria[], int from, int cantBytes) {
+    int valor = 0;
+    int n = from + cantBytes;
+    for(int i = from; i < n; i++){
+        valor = (valor << 8) | (memoria[i] & 0x000000FF);  // no mantiene signo de valor leido
+        //printf("valor %X i: %d\n", valor, i);
+    }
+    //printf("valor: %x\n", valor);
+    valor = valor << (32 - 8*cantBytes);  //restora signo
+    valor = valor >> (32 - 8*cantBytes);
+    //printf("valor de memoria: %08X from: %X n: %d\n", valor, from, n);
+    return valor;
+}
+
 void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[], int disassembler){ //IP todavia apunta a inicio de instruccion
-    int instruccion = registros[MBR_INDEX];
+    int instruccion = leerInstruccionOperando(memoria, conseguirDirFisica(registros[IP_INDEX], 1, tablaSegmentos), 1);
     //printf("MBR: %X\n", registros[MBR_INDEX]);
     int tipo1 = (instruccion >> 6) /*(y como es SAR:)*/ & 0b11;
     int tipo2 = (instruccion >> 4) & 0b11;
@@ -203,16 +217,11 @@ void decodeInstruccion(char memoria[], int registros[], int tablaSegmentos[], in
     registros[OPC_INDEX] = instruccion & 0b00011111;
     //printf("OPC: %X tipo1: %X tipo2: %X\n", registros[OPC_INDEX], tipo1, tipo2);
 
-    fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX] + 1, tipo1); //fetch op1 (o B)
-    registros[OP1_INDEX] = registros[MBR_INDEX]; //depende de que leerMemoria escriba 0 en el MBR si el tipo1 es 0 (instruccion sin operandos)
-    if(tipo2 == 0){
-        //registros[OP1_INDEX] = registros[MBR_INDEX];
-        registros[OP2_INDEX] = 0;
-    }else{
-        //registros[OP2_INDEX] = registros[MBR_INDEX];
-        fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX] + 1 + tipo1, tipo2);
-        registros[OP2_INDEX] = registros[MBR_INDEX];
-    }
+    //fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX] + 1, tipo1); //fetch op1 (o B)
+    registros[OP1_INDEX] = leerInstruccionOperando(memoria, conseguirDirFisica(registros[IP_INDEX]+1, tipo1, tablaSegmentos), tipo1); //depende de que leerMemoria escriba 0 en el MBR si el tipo1 es 0 (instruccion sin operandos)
+    //registros[OP2_INDEX] = registros[MBR_INDEX];
+    //fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX] + 1 + tipo1, tipo2);
+    registros[OP2_INDEX] = leerInstruccionOperando(memoria, conseguirDirFisica(registros[IP_INDEX]+1+tipo1, tipo2, tablaSegmentos), tipo2);
 
     //acá iría el disassemler
     registros[OP1_INDEX] &= 0x00FFFFFF;
@@ -519,7 +528,7 @@ int cadenaToInmediato(char* cadena, int formato){ //lo convierte a valor de 32 b
     return inmediato;
 }
 
-char* inmediatoToString(int inmediato, int formato){//
+char* inmediatoToString(int inmediato, int formato, int tamanioCelda){//
     static char cadena[192];
     char temp[48];
     cadena[0] = '\0';
@@ -534,13 +543,11 @@ char* inmediatoToString(int inmediato, int formato){//
     if (formato & 0x02) { // caracter
         if (!primero) 
             strcat(cadena, " ");
-        for(int i=0; i<4; i++){
-            char caracter = (inmediato >> (24-i*8)) & 0xFF;
-            if(caracter != 0){
-                snprintf(temp, sizeof(temp), "%c", (caracter >= 32 && caracter <= 126) ? caracter : '.');
-                strcat(cadena, temp);
-                primero = 0;
-            }
+        for(int /* i=0; i<tamanioCelda; */ i=tamanioCelda-1; i>=0; i--){
+            char caracter = (inmediato >> (/* 24- */i*8)) & 0xFF;
+            snprintf(temp, sizeof(temp), "%c", (caracter >= 32 && caracter <= 126) ? caracter : '.');
+            strcat(cadena, temp);
+            primero = 0;
         }
     }
     if (formato & 0x04) { // octal
@@ -607,7 +614,7 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
 
         }else if(modo == 2){// WRITE (escribe en consola)
             leerMemoria(memoria, registros);
-            printf("%s\n", inmediatoToString(registros[MBR_INDEX], formato));
+            printf("%s\n", inmediatoToString(registros[MBR_INDEX], formato, tamanioCelda));
         }else
             terminarPrograma("operando invalido para instruccion sys");
             
@@ -657,7 +664,7 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
 void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones, int disassembler) {
     //ciclo real
     while(registros[IP_INDEX] != -1){
-        fetchInstruccion(memoria, registros, tablaSegmentos);
+        //fetchInstruccion(memoria, registros, tablaSegmentos);
         decodeInstruccion(memoria, registros, tablaSegmentos, disassembler);
         operaciones[registros[OPC_INDEX]](memoria, registros, tablaSegmentos);
     }

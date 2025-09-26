@@ -19,7 +19,7 @@ void mostrarOperando(int operando, int tipoOperando) {
         printf("%s", NOMBRE_REG[operando & 0x1F]);
     else
         if (tipoOperando==2)
-            printf("0x%x", (operando << 16) >> 16);
+            printf("0x%X", (operando << 16) >> 16);
         else
             if (tipoOperando==3) {
                 printf("[%s", NOMBRE_REG[(operando >> 16) & 0x1F]);

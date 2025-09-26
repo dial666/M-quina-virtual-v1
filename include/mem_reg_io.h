@@ -18,5 +18,6 @@ void escribirMemoriaRegistro(char memoria[], int registros[], int tablaSegmentos
 int OperandotoInmediato(int operando, char memoria[], int registros[], int tablaSegmentos[]);
 void verificarIndiceRegistro(int indexReg);
 void fetch(char memoria[], int registros[], int tablaSegmentos[], int dirLogica, int cantBytes);
+int conseguirDirFisica(int dirLogica, int cantBytes, int tablaSegmentos[]);
 
 #endif
