@@ -537,7 +537,6 @@ char* inmediatoToString(int inmediato, int formato, int tamanioCelda){//
     
     if (formato & 0x08) { // hexadecimal
         snprintf(temp, sizeof(temp), "0x%X", inmediato);
-        if (!primero) strcat(cadena, " ");
         strcat(cadena, temp);
         primero = 0;
     }
@@ -561,6 +560,7 @@ char* inmediatoToString(int inmediato, int formato, int tamanioCelda){//
     }
 
     if (formato & 0x01) { // decimal
+        if (!primero) strcat(cadena, " ");
         snprintf(temp, sizeof(temp), "%d", inmediato);
         strcat(cadena, temp);
         primero = 0;
