@@ -534,12 +534,21 @@ char* inmediatoToString(int inmediato, int formato, int tamanioCelda){//
     cadena[0] = '\0';
 
     int primero = 1;
-
-    if (formato & 0x01) { // decimal
-        snprintf(temp, sizeof(temp), "%d", inmediato);
+    
+    if (formato & 0x08) { // hexadecimal
+        snprintf(temp, sizeof(temp), "0x%X", inmediato);
+        if (!primero) strcat(cadena, " ");
         strcat(cadena, temp);
         primero = 0;
     }
+
+    if (formato & 0x04) { // octal
+        snprintf(temp, sizeof(temp), "0o%o", inmediato);
+        if (!primero) strcat(cadena, " ");
+        strcat(cadena, temp);
+        primero = 0;
+    }
+
     if (formato & 0x02) { // caracter
         if (!primero) 
             strcat(cadena, " ");
@@ -550,18 +559,13 @@ char* inmediatoToString(int inmediato, int formato, int tamanioCelda){//
             primero = 0;
         }
     }
-    if (formato & 0x04) { // octal
-        snprintf(temp, sizeof(temp), "0o%o", inmediato);
-        if (!primero) strcat(cadena, " ");
+
+    if (formato & 0x01) { // decimal
+        snprintf(temp, sizeof(temp), "%d", inmediato);
         strcat(cadena, temp);
         primero = 0;
     }
-    if (formato & 0x08) { // hexadecimal
-        snprintf(temp, sizeof(temp), "0x%X", inmediato);
-        if (!primero) strcat(cadena, " ");
-        strcat(cadena, temp);
-        primero = 0;
-    }
+
     if (formato & 0x10) { // binario
         char binario[33];
         int pos = 0;
