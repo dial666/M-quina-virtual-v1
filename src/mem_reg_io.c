@@ -154,12 +154,7 @@ void cargarMBR(int registros[], int valor){
  * a leer y en los otros 2 una dirección física válida.
  * @pre En MBR debe haber un valor.
  */
-void escribirMemoria(char memoria[], int registros[], int tablaSegmentos[]){
-    int cantBytes = registros[MAR_INDEX] >> 16;
-    int direccion = registros[MAR_INDEX] & 0x0000FFFF;
-
-    int valor = registros[MBR_INDEX];
-    //printf("cantBytes: %X direccion:%X valor:%d\n", cantBytes, direccion, valor);
+void escribirMemoria(int cantBytes, int direccion, int valor, char memoria[]){
     for(int i = 1; i <= cantBytes; i++)
         memoria[direccion + cantBytes - i] = (valor << (32-i*8)) >> 24; //shiftea el byte que quiero escribir hasta el byte mas significativo y luego lo shiftea hasta el byte menos significativo
         //creo que el char trunca y toma el byte menos significativo del int, asi que tambien podria ser:
@@ -182,7 +177,7 @@ void store(char memoria[], int registros[], int tablaSegmentos[], int dirLogica,
     cargarLAR(dirLogica, registros);
     cargarMAR(cantBytes, registros, tablaSegmentos);
     cargarMBR(registros, valor);
-    escribirMemoria(memoria, registros, tablaSegmentos);
+    escribirMemoria(registros[MAR_INDEX] >> 16, registros[MAR_INDEX] & 0x0000FFFF, registros[MBR_INDEX], memoria);
 }
 
 /**

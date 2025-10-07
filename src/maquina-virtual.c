@@ -8,18 +8,13 @@
 #include "constantes.h"
 #include "utils.h"
 #include "disassembler.h"
+#include "lectura_arch.h"
 
 typedef void (*ArrayOperaciones[32])(char[], int[], int[]);
 
-int verificarNumOperacion(char primer_byte);
 //void mostrarArreglo(char* arr[], int n);
 void verificarIndiceSegmento(int indiceSegmento, int tablaSegmentos[]);
 int mascara0primerosBits(int cantBits);
-
-void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]);
-void convertirArregloAInt(char arregloBytes[], int n, int *num);
-void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]);
-void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]);
 void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones, int disassembler);
 
 void mv_mov(char memoria[], int registros[], int tablaSegmentos[]);
@@ -52,12 +47,10 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]);
 
 int main(int argc, char *argv[]) {
     int registros[TAM_REGISTROS]; //32 registros de 32 bits
-    char memoria[TAM_MEMORIA];  //16 KiB
-    int tablasegmentos[TAM_TABLA_SEGMENTOS]; //8 entradas de 32 bits
-
+    char memoria[TAM_MEMORIA], *nombVmi;
+    int tablasegmentos[TAM_TABLA_SEGMENTOS], disassembler, tamMemoria;
+    
     ArrayOperaciones operaciones;//array de funciones
-
-    int disassembler;
 
     operaciones[0x00] = &mv_sys;
     operaciones[0x01] = &mv_jmp;
@@ -92,94 +85,18 @@ int main(int argc, char *argv[]) {
     operaciones[0x1E] = &mv_ldh;
     operaciones[0x1F] = &mv_rnd;
 
-    leerArchivoEntrada(argv[1], memoria, tablasegmentos, registros);
-    disassembler = argc==3 && strcmp(argv[2], "-d")==0;
     srand(time(NULL));
+    leerArch(argv, argc, &nombVmi, &disassembler, &tamMemoria, memoria, registros, tablasegmentos);
     ejecutarPrograma(memoria, registros, tablasegmentos, operaciones, disassembler);
 
     return 0;
 }
-
-void leerArchivoEntrada(char nombreArchivo[], char memoria[], int tablaSegmentos[], int registros[]) {
-    FILE *archBin;
-    int tamCodigo; //variable auxiliar para leer cada dos bytes
-    char lineaCodigo;
-    unsigned char aux;;
-    int i;
-
-
-    archBin = fopen(nombreArchivo, "rb");
-    if (archBin == NULL)
-        terminarPrograma("no se pudo abrir el archivo");
-    else {
-        //leer tamaño de codigo del archivo
-        fseek(archBin, 6, SEEK_SET);
-        i = 0;
-        tamCodigo = 0;
-        while (i < CANT_BYTES_TAM_CODIGO && fread(&aux, sizeof(aux), 1, archBin) == 1) {
-            tamCodigo = tamCodigo | (aux << ((CANT_BYTES_TAM_CODIGO-1-i)*8));
-            i++;
-        }
-
-        if (i != CANT_BYTES_TAM_CODIGO)
-            terminarPrograma("no se pudo leer el tamano de codigo");  
-
-        if (tamCodigo > TAM_MEMORIA)
-            terminarPrograma("el tamamo del codigo supera al de la memoria");
-
-        i = 0;
-        while (fread(&lineaCodigo, sizeof(lineaCodigo), 1, archBin) == 1) {
-            memoria[i] = lineaCodigo;
-            i++;
-        }
-
-        if(i != tamCodigo)
-            terminarPrograma("el tamano del codigo especificado en la cabecera no coincide con el tamano real");
-
-        inicializarTablaSegmentos(tamCodigo, tablaSegmentos);
-        inicializarPunterosInicioSegmentos(tablaSegmentos, registros);
-        
-        fclose(archBin);
-    }
-}
-
-void inicializarTablaSegmentos(int tamanoCodigo, int tablaSegmentos[]) {
-    int aux = 0,
-        i;
-
-    //para validar los accesos a la tabla de segmentos, es necesario inic. los valores de las 8 entradas
-    for (i = 0; i< TAM_TABLA_SEGMENTOS; i++)
-        tablaSegmentos[i] = -1;
-
-    aux = aux | tamanoCodigo;
-    tablaSegmentos[0] = aux;
-    aux = aux << 16;
-    aux = aux | (TAM_MEMORIA - tamanoCodigo);
-    tablaSegmentos[1] = aux;
-}
-
-void inicializarPunterosInicioSegmentos(int tablaSegmentos[], int registros[]) {
-    //inicialiar CS
-    registros[CS_INDEX] = 0;
-    //inicializar DS
-    registros[DS_INDEX] = 0;
-    registros[DS_INDEX] = registros[DS_INDEX] | 0x00010000;
-    //inicializar IP = CS
-    registros[IP_INDEX] = registros[CS_INDEX];
-
-    //de prueba:
-    //registros[7] = 0x00010000;
-}
+    
 
 void intercambiarVar(int * a, int * b){
     *a = (*a) ^ (*b);
     *b = (*a) ^ (*b);
     *a = (*a) ^ (*b);
-}
-
-int verificarNumOperacion(char primer_byte){ //parametro = primer byte de instruccion, solo analiza ultimos 5 bits
-    primer_byte &= 0b00011111;
-    return (primer_byte <= 0x1F) && !(primer_byte > 0x08 && primer_byte < 0x0F);
 }
 
 void mostrarArreglo(char memoria[],int principio, int n)
@@ -190,9 +107,6 @@ void mostrarArreglo(char memoria[],int principio, int n)
     }
 }
 
-void fetchInstruccion(char memoria[], int registros[], int tablaSegmentos[]){
-    fetch(memoria, registros, tablaSegmentos, registros[IP_INDEX], 1);
-}
 
 int leerInstruccionOperando(char memoria[], int from, int cantBytes) {
     int valor = 0;
@@ -614,7 +528,7 @@ void mv_sys(char memoria[], int registros[], int tablaSegmentos[]){
         if(modo == 1){ //READ (escribe en memoria lo leido en consola)
             scanf("%199s", cadenaConsola);
             registros[MBR_INDEX] = cadenaToInmediato(cadenaConsola, formato);
-            escribirMemoria(memoria, registros, tablaSegmentos);
+                escribirMemoria(registros[MAR_INDEX] >> 16, registros[MAR_INDEX] & 0x0000FFFF, registros[MBR_INDEX], memoria);
 
         }else if(modo == 2){// WRITE (escribe en consola)
             leerMemoria(memoria, registros);
@@ -668,7 +582,6 @@ void mv_vacio(char memoria[], int registros[], int tablaSegmentos[]){
 void ejecutarPrograma(char memoria[], int registros[], int tablaSegmentos[], ArrayOperaciones operaciones, int disassembler) {
     //ciclo real
     while(registros[IP_INDEX] != -1){
-        //fetchInstruccion(memoria, registros, tablaSegmentos);
         decodeInstruccion(memoria, registros, tablaSegmentos, disassembler);
         operaciones[registros[OPC_INDEX]](memoria, registros, tablaSegmentos);
     }
