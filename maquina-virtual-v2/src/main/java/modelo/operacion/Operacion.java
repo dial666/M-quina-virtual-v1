@@ -10,5 +10,21 @@ package modelo.operacion;
  */
 public class Operacion
 {
+    private ConstantesOperaciones tipoOperacion;
     
+    public Operacion(int codOperacion)
+    {
+        this.tipoOperacion = ConstantesOperaciones.getTipoOperacion(codOperacion);
+    }
+
+    public ConstantesOperaciones getTipoOperacion()
+    {
+        return this.tipoOperacion;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return ConstantesOperaciones.getNombre(tipoOperacion);
+    }
 }

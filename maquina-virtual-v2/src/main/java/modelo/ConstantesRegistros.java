@@ -34,36 +34,38 @@ public enum ConstantesRegistros
     KS(30),
     PS(31);
     
-    private static final String[] nombresRegistros;
-    private static final int cantidadRegistros = 32;
+    private static final int[] SHIFT = {0, 0, 8, 0};
+    private static final int[] MASK  = {0xFFFFFFFF, 0x000000FF, 0x0000FF00, 0x0000FFFF};
+    private static final String[] NOMBRESREGISTROS;
+    private static final int CANTREGISTROS = 32;
     private final int codigo;
         
     static 
     {
-        nombresRegistros = new String[ConstantesRegistros.cantidadRegistros];
-        nombresRegistros[LAR.getCodigo()] = "LAR";
-        nombresRegistros[MAR.getCodigo()] = "MAR";
-        nombresRegistros[MBR.getCodigo()] = "MBR";
-        nombresRegistros[IP.getCodigo()] = "IP";
-        nombresRegistros[OPC.getCodigo()] = "OPC";
-        nombresRegistros[OP1.getCodigo()] = "OP1";
-        nombresRegistros[OP2.getCodigo()] = "OP2";
-        nombresRegistros[SP.getCodigo()] = "SP";
-        nombresRegistros[BP.getCodigo()] = "BP";
-        nombresRegistros[EAX.getCodigo()] = "EAX";
-        nombresRegistros[EBX.getCodigo()] = "EBX";
-        nombresRegistros[ECX.getCodigo()] = "ECX";
-        nombresRegistros[EDX.getCodigo()] = "EDX";
-        nombresRegistros[EEX.getCodigo()] = "EEX";
-        nombresRegistros[EFX.getCodigo()] = "EFX";
-        nombresRegistros[AC.getCodigo()] = "AC";
-        nombresRegistros[CC.getCodigo()] = "CC";
-        nombresRegistros[CS.getCodigo()] = "CS";
-        nombresRegistros[DS.getCodigo()] = "DS";
-        nombresRegistros[ES.getCodigo()] = "ES";
-        nombresRegistros[SS.getCodigo()] = "SS";
-        nombresRegistros[KS.getCodigo()] = "KS";
-        nombresRegistros[PS.getCodigo()] = "PS";
+        NOMBRESREGISTROS = new String[ConstantesRegistros.CANTREGISTROS];
+        NOMBRESREGISTROS[LAR.getCodigo()] = "LAR";
+        NOMBRESREGISTROS[MAR.getCodigo()] = "MAR";
+        NOMBRESREGISTROS[MBR.getCodigo()] = "MBR";
+        NOMBRESREGISTROS[IP.getCodigo()] = "IP";
+        NOMBRESREGISTROS[OPC.getCodigo()] = "OPC";
+        NOMBRESREGISTROS[OP1.getCodigo()] = "OP1";
+        NOMBRESREGISTROS[OP2.getCodigo()] = "OP2";
+        NOMBRESREGISTROS[SP.getCodigo()] = "SP";
+        NOMBRESREGISTROS[BP.getCodigo()] = "BP";
+        NOMBRESREGISTROS[EAX.getCodigo()] = "EAX";
+        NOMBRESREGISTROS[EBX.getCodigo()] = "EBX";
+        NOMBRESREGISTROS[ECX.getCodigo()] = "ECX";
+        NOMBRESREGISTROS[EDX.getCodigo()] = "EDX";
+        NOMBRESREGISTROS[EEX.getCodigo()] = "EEX";
+        NOMBRESREGISTROS[EFX.getCodigo()] = "EFX";
+        NOMBRESREGISTROS[AC.getCodigo()] = "AC";
+        NOMBRESREGISTROS[CC.getCodigo()] = "CC";
+        NOMBRESREGISTROS[CS.getCodigo()] = "CS";
+        NOMBRESREGISTROS[DS.getCodigo()] = "DS";
+        NOMBRESREGISTROS[ES.getCodigo()] = "ES";
+        NOMBRESREGISTROS[SS.getCodigo()] = "SS";
+        NOMBRESREGISTROS[KS.getCodigo()] = "KS";
+        NOMBRESREGISTROS[PS.getCodigo()] = "PS";
     }
     
     private ConstantesRegistros(int codigo)
@@ -78,6 +80,11 @@ public enum ConstantesRegistros
     
     public static String getNombre(int codigo)
     {
-        return nombresRegistros[codigo];
+        return NOMBRESREGISTROS[codigo];
+    }
+
+    public static int getCantidadRegistros()
+    {
+        return CANTREGISTROS;
     }
 }

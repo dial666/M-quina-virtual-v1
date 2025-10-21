@@ -4,7 +4,8 @@
  */
 package modelo;
 
-import java.util.HashMap;
+
+import modelo.operando.OperandoRegistro;
 
 /**
  *
@@ -12,4 +13,25 @@ import java.util.HashMap;
  */
 public class Registros
 { 
+    private int[] registros;
+
+    public Registros()
+    {
+        registros = new int[ConstantesRegistros.getCantidadRegistros()];
+    }
+    
+    public int getValor(OperandoRegistro operando)
+    {
+        int valor = (this.registros[operando.getCodRegistro()] << operando.getShiftExtensionSigno()) >> operando.getShiftExtensionSigno();
+        valor >>= operando.getShift();
+        return valor;
+    }
+    
+    public void setValor(OperandoRegistro operando, int valor)
+    {
+        valor &= operando.getMask();
+        valor <<= operando.getShift();
+        this.registros[operando.getCodRegistro()] |= valor;
+    }
+        
 }

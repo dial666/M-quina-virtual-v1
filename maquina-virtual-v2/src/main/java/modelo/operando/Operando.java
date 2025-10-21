@@ -9,9 +9,7 @@ package modelo.operando;
  * @author valen
  */
 public abstract class Operando
-{
-    public abstract TipoOperando getTipo();
-    
+{   
     @Override
     public abstract String toString();
     

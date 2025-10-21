@@ -10,15 +10,17 @@ import modelo.ConstantesRegistros;
  *
  * @author valen
  */
-public class OperandoRegistro extends Operando
+public abstract class OperandoRegistro extends Operando
 {
     private int codRegistro;
-    private int codSector;
+    private int mask;
+    private int shift;
     
-    public OperandoRegistro(int operandoRegistro)
+    public OperandoRegistro(int codRegistro, int mask, int shift)
     {
-        this.codRegistro = operandoRegistro & 0x1F;
-        this.codSector = (operandoRegistro >> 6) & 0x3;
+        this.codRegistro = codRegistro;
+        this.mask = mask;
+        this.shift = shift;
     }
 
     public int getCodRegistro()
@@ -26,36 +28,13 @@ public class OperandoRegistro extends Operando
         return codRegistro;
     }
 
-    public int getCodSector()
+    public int getMask()
     {
-        return codSector;
+        return mask;
     }
 
-    @Override
-    public TipoOperando getTipo()
+    public int getShift()
     {
-        return TipoOperando.REG;
-    }
-
-    @Override
-    public String toString()
-    {
-        String disassembler;
-        
-        if (this.codRegistro >= ConstantesRegistros.EAX.getCodigo() && this.codRegistro <= ConstantesRegistros.EFX.getCodigo() && this.codSector != 0b00)
-        {
-            String letra = ConstantesRegistros.getNombre(this.codRegistro);
-            letra = letra.substring(1, letra.length() - 1);
-            disassembler = letra;
-            disassembler += switch (this.codSector)
-            {
-                case 0b01 -> "L";
-                case 0b10 -> "H";
-                default -> "X";
-            };
-        }
-        else
-            disassembler = ConstantesRegistros.getNombre(this.codRegistro);
-        return disassembler;
+        return shift;
     }
 }
