@@ -4,6 +4,10 @@
 
 package com.mycompany.maquina.virtual.v2;
 
+import modelo.operando.Operando;
+import modelo.operando.OperandoMemoria;
+import modelo.operando.OperandoRegistro;
+
 /**
  *
  * @author valen
@@ -11,6 +15,11 @@ package com.mycompany.maquina.virtual.v2;
 public class MaquinaVirtualV2 {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        Operando opm = Operando.creaOperando(3, 0x0AFFFE);
+        Operando opr = Operando.creaOperando(1, 0x4F);
+        Operando opi = Operando.creaOperando(2, 0xFFFFFFF4);
+        System.out.println(opm);
+        System.out.println(opr);
+        System.out.println(opi);
     }
 }
