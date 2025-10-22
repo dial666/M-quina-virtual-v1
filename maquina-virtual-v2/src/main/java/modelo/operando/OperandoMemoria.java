@@ -5,22 +5,24 @@
 package modelo.operando;
 
 import modelo.ConstantesRegistros;
+import modelo.Contexto;
+import modelo.excepciones.SegmentationFaultException;
 
 /**
  *
  * @author valen
  */
-public class OperandoMemoria extends Operando
+public class OperandoMemoria implements Operando
 {
     private int codTamanioCelda;
-    private int codRegistro;
+    private OperandoRegistro operandoRegistro;
     private int offset;
     
-    public OperandoMemoria(int operandoMemoria)
+    public OperandoMemoria(int codTamanioCelda, OperandoRegistro operandoRegistro, int offset)
     {
-        this.offset = (operandoMemoria << 16) >> 16;
-        this.codRegistro = (operandoMemoria >> 16) & 0x1F;
-        this.codTamanioCelda = (operandoMemoria >> 22) & 0x3;
+        this.offset = offset;
+        this.operandoRegistro = operandoRegistro;
+        this.codTamanioCelda = codTamanioCelda;
     }
 
     public int getCodTamanioCelda()
@@ -28,22 +30,16 @@ public class OperandoMemoria extends Operando
         return codTamanioCelda;
     }
 
-    public int getCodRegistro()
+    public OperandoRegistro getOperandoRegistro()
     {
-        return codRegistro;
+        return operandoRegistro;
     }
 
     public int getOffset()
     {
         return offset;
     }
-      
-    @Override
-    public TipoOperando getTipo()
-    {
-        return TipoOperando.MEM;
-    }
-
+ 
     @Override
     public String toString()
     {
@@ -55,11 +51,23 @@ public class OperandoMemoria extends Operando
             case 0b10 -> "w";
             default -> "l";
         };
-        disassembler += tamanioCelda + "[" + ConstantesRegistros.getNombre(this.codRegistro);
+        disassembler += tamanioCelda + "[" + ConstantesRegistros.getNombre(this.operandoRegistro.getCodRegistro());
         if (this.offset >= 0)
             disassembler += "+";
         disassembler += this.offset + "]";
         return disassembler;
+    }
+
+    @Override
+    public int getValor(Contexto vmx) throws SegmentationFaultException
+    {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public int setValor(Contexto vmx) throws SegmentationFaultException, IllegalArgumentException
+    {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
 }

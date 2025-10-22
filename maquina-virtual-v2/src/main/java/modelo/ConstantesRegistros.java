@@ -87,4 +87,9 @@ public enum ConstantesRegistros
     {
         return CANTREGISTROS;
     }
+    
+    public static int getMask(int codSector)
+    {
+        return MASK[codSector];
+    }
 }

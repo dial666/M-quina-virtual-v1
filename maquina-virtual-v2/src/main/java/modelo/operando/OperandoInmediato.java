@@ -4,11 +4,14 @@
  */
 package modelo.operando;
 
+import modelo.Contexto;
+import modelo.excepciones.SegmentationFaultException;
+
 /**
  *
  * @author valen
  */
-public class OperandoInmediato extends Operando
+public class OperandoInmediato implements Operando
 {
     private int valor;
     
@@ -16,17 +19,37 @@ public class OperandoInmediato extends Operando
     {
         this.valor = operandoInmediato;
     }
-    
-    @Override
-    public TipoOperando getTipo()
+
+    public int getValor()
     {
-        return TipoOperando.INM;
+        return valor;
     }
 
     @Override
     public String toString()
     {
         return "" + this.valor;
+    }
+
+    @Override
+    public int getValor(Contexto vmx)
+    {
+        int val = 0;
+        try
+        {
+            val = vmx.getValor(this);
+        } 
+        catch (SegmentationFaultException e)
+        {
+            throw new IllegalStateException("no deberia ocurrir un segmentation fault en un inmediato");
+        }
+        return val;
+    }
+
+    @Override
+    public int setValor(Contexto Vmx) throws SegmentationFaultException, IllegalArgumentException
+    {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
 }

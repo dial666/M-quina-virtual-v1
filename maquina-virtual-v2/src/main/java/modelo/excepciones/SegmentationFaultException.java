@@ -2,18 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package modelo;
+package modelo.excepciones;
 
 /**
  *
  * @author valen
  */
-public class Memoria
+public class SegmentationFaultException extends Exception
 {
-    private byte[] memoria;
-    
-    public Memoria(int tamanio)
+
+    public SegmentationFaultException(String message)
     {
-        this.memoria = new byte[tamanio];
+        super(message);
     }
+    
 }

@@ -4,11 +4,24 @@
  */
 package modelo.operando;
 
+import modelo.ConstantesRegistros;
+
 /**
  *
  * @author valen
  */
 public class OperandoRegistroE extends OperandoRegistro
 {
+
+    public OperandoRegistroE(int codRegistro)
+    {
+        super(codRegistro, 0xFFFFFFFF, 0, 0);
+    }
+
+    @Override
+    public String toString()
+    {
+        return ConstantesRegistros.getNombre(this.getCodRegistro());
+    }
     
 }
