@@ -9,6 +9,7 @@ import modelo.operando.Operando;
 import modelo.operando.OperandoInmediato;
 import modelo.operando.OperandoMemoria;
 import modelo.operando.OperandoRegistro;
+import modelo.utils.IntUtils;
 
 /**
  *
@@ -45,7 +46,26 @@ public class MaquinaVirtual implements Contexto
     
     public int getValor(OperandoMemoria operando) throws SegmentationFaultException
     {
-        return 0;
+        int dirLogica = getValor(operando.getOperandoRegistro()) + operando.getOffset();
+        int cantBytes = 4 - operando.getCodTamanioCelda();
+        return getValorMemoriaModificaReg(dirLogica, cantBytes);
+    }
+    
+    public int getValorMemoriaModificaReg(int dirLogica, int cantBytes) throws SegmentationFaultException
+    {
+        this.registros.setLAR(dirLogica);
+        int dirFisica = this.tablaSegmentos.getDirFisica(dirLogica, cantBytes);
+        int valorMar = IntUtils.putHigh(0, cantBytes);
+        valorMar = IntUtils.putLow(valorMar, dirFisica);
+        this.registros.setMAR(valorMar);
+        this.registros.setMBR(this.memoria.getValor(dirFisica, cantBytes));
+        return this.registros.getMBR();
+    }
+    
+    public int getValorMemoria(int dirLogica, int cantBytes) throws SegmentationFaultException
+    {
+        int dirFisica = this.tablaSegmentos.getDirFisica(dirLogica, cantBytes);
+        return this.memoria.getValor(dirFisica, cantBytes);
     }
     
     @Override

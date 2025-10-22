@@ -33,5 +33,20 @@ public class Registros
         valor <<= operando.getShift();
         this.registros[operando.getCodRegistro()] |= valor;
     }
+    
+    public void setLAR(int valor)
+    {
+        this.registros[ConstantesRegistros.LAR.getCodigo()] = valor;
+    }
+    
+    public void setMAR(int valor)
+    {
+        this.registros[ConstantesRegistros.MAR.getCodigo()] = valor;
+    }
+    
+    public void setMBR(int valor)
+    {
+        this.registros[ConstantesRegistros.MBR.getCodigo()] = valor;
+    }
         
 }

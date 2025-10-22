@@ -16,4 +16,24 @@ public class Memoria
     {
         this.memoria = new byte[tamanio];
     }
+    
+    public int getValor(int dirFisica, int cantBytes)
+    {
+        int valor = 0;
+        for (int i = 0; i < cantBytes; i++) 
+            valor = (valor << 8) | (memoria[dirFisica + i] & 0xFF);
+    
+        valor = valor << (32 - 8*cantBytes);
+        valor = valor >> (32 - 8*cantBytes);
+        return valor;
+    }
+    
+    public void setValor(int dirFisica, int cantBytes, int valor)
+    {
+         for (int i = 0; i < cantBytes; i++) 
+         {
+            int shift = 8 * (cantBytes - 1 - i);
+            memoria[dirFisica + i] = (byte) ((valor >> shift) & 0xFF);
+         }
+    }
 }
