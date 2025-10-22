@@ -6,7 +6,6 @@ package modelo;
 
 import modelo.excepciones.SegmentationFaultException;
 import modelo.operando.Operando;
-import modelo.operando.OperandoRegistro;
 
 /**
  *

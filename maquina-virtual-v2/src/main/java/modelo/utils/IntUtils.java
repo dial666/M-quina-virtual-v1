@@ -10,13 +10,33 @@ package modelo.utils;
  */
 public class IntUtils
 {
-    public static int getHigh(int valor)
+    public static int getHighSigned(int valor)
     {
         return valor >> 16;
     }
     
-    public static int getLow(int valor)
+    public static int getLowSigned(int valor)
     {
         return (valor << 16) >> 16;
+    }
+    
+    public static int getHighUnsigned(int valor)
+    {
+        return (valor >>> 16) & 0xFFFF;
+    }
+    
+    public static int getLowUnsigned(int valor)
+    {
+        return valor & 0xFFFF;
+    }
+    
+    public static int putHigh(int base, int valor)
+    {
+        return (base & 0x0000FFFF) | (valor << 16);
+    }
+    
+    public static int putLow(int base, int valor)
+    {
+        return (base & 0xFFFF0000) | (valor & 0xFFFF);
     }
 }

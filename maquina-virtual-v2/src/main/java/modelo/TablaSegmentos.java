@@ -5,6 +5,7 @@
 package modelo;
 
 import modelo.excepciones.SegmentationFaultException;
+import modelo.excepciones.TablaSegmentosLlenaException;
 import modelo.utils.IntUtils;
 
 /**
@@ -28,20 +29,46 @@ public class TablaSegmentos
     
     public int getDirFisica(int dirLogica, int cantBytes) throws SegmentationFaultException
     {
-        int indiceTabla = IntUtils.getHigh(dirLogica);
-        int offset = IntUtils.getLow(dirLogica);
+        int indiceTabla = IntUtils.getHighSigned(dirLogica);
+        int offset = IntUtils.getLowSigned(dirLogica);
         
         if (indiceTabla < 0 || indiceTabla >= TablaSegmentos.getCentEntradas() || this.tablaSegmentos[indiceTabla] == -1)
             throw new SegmentationFaultException("segmentation fault");
         
-        int dirBase = IntUtils.getHigh(this.tablaSegmentos[indiceTabla]);
+        int dirBase = IntUtils.getHighUnsigned(this.tablaSegmentos[indiceTabla]);
         int dirFisica = dirBase + offset;
-        int tamSegmento = IntUtils.getLow(this.tablaSegmentos[indiceTabla]);
+        int tamSegmento = IntUtils.getLowUnsigned(this.tablaSegmentos[indiceTabla]);
         if (dirBase <= dirFisica && dirBase + tamSegmento >= dirFisica + cantBytes)
             return dirFisica;
         else
-            throw new SegmentationFaultException("segmentation fault");
+            throw new SegmentationFaultException("segmentation fault"); 
+    }
+    
+    /**
+     * 
+     * @param tamSegmento
+     * @return indice de la entrada en la tabla de segmentos
+     * @throws TablaSegmentosLlenaException 
+     */
+    public int agregarEntrada(int tamSegmento) throws  TablaSegmentosLlenaException
+    {
+        int i = 0;
+        int n = TablaSegmentos.getCentEntradas();
+        while (i < n && this.tablaSegmentos[i] != -1)
+            i++;
         
+        if (i >= n)
+            throw new TablaSegmentosLlenaException("la tabla de segmentos no tiene espacio para mas segmentos");
+        
+        int base;
+        if (i > 0)
+            base = IntUtils.getHighUnsigned(this.tablaSegmentos[i-1]) + IntUtils.getLowUnsigned(this.tablaSegmentos[i-1]);
+        else
+            base = 0;
+        
+         this.tablaSegmentos[i] = IntUtils.putHigh(0, base);
+         this.tablaSegmentos[i] = IntUtils.putLow(this.tablaSegmentos[i], tamSegmento);
+         return i;
     }
 
     public static int getCentEntradas()

@@ -8,7 +8,11 @@ package modelo.excepciones;
  *
  * @author valen
  */
-public class TablaSegmentosLlenaException
+public class TablaSegmentosLlenaException extends Exception
 {
-    
+
+    public TablaSegmentosLlenaException(String message)
+    {
+        super(message);
+    }
 }

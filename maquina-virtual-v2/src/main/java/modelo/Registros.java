@@ -48,5 +48,10 @@ public class Registros
     {
         this.registros[ConstantesRegistros.MBR.getCodigo()] = valor;
     }
+    
+    public int getMBR()
+    {
+        return this.registros[ConstantesRegistros.MBR.getCodigo()];
+    }
         
 }
