@@ -5,8 +5,8 @@
 package modelo.operando;
 
 import modelo.ConstantesRegistros;
-import modelo.Contexto;
 import modelo.excepciones.SegmentationFaultException;
+import modelo.UnidadIO;
 
 /**
  *

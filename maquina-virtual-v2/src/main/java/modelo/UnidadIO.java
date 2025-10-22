@@ -11,8 +11,10 @@ import modelo.operando.Operando;
  *
  * @author valen
  */
-public interface Contexto
+public interface UnidadIO
 {
     public int getValor(Operando operando) throws SegmentationFaultException;
-    public void setValor(Operando operando) throws SegmentationFaultException, IllegalArgumentException;   
+    public int getValorMemoriaModificaReg(int dirLogica, int cantBytes) throws SegmentationFaultException;
+    public void setValor(Operando operando, int valor) throws SegmentationFaultException;   
+    public void setValorMemoriaModifReg(int dirLogica, int cantBytes, int valor) throws SegmentationFaultException;
 }

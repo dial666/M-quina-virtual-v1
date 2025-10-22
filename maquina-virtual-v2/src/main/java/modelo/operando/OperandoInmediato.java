@@ -4,8 +4,8 @@
  */
 package modelo.operando;
 
-import modelo.Contexto;
 import modelo.excepciones.SegmentationFaultException;
+import modelo.UnidadIO;
 
 /**
  *
@@ -32,7 +32,7 @@ public class OperandoInmediato implements Operando
     }
 
     @Override
-    public int getValor(Contexto vmx)
+    public int getValor(UnidadIO vmx)
     {
         int val = 0;
         try
@@ -47,9 +47,9 @@ public class OperandoInmediato implements Operando
     }
 
     @Override
-    public int setValor(Contexto Vmx) throws SegmentationFaultException, IllegalArgumentException
+    public void setValor(UnidadIO vmx, int valor) throws SegmentationFaultException
     {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        vmx.setValor(this, valor);
     }
     
 }

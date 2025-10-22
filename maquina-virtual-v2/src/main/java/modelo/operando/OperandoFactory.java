@@ -4,8 +4,8 @@
  */
 package modelo.operando;
 
-import modelo.Contexto;
 import modelo.excepciones.SegmentationFaultException;
+import modelo.UnidadIO;
 
 /**
  *

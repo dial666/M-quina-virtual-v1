@@ -15,7 +15,7 @@ import modelo.utils.IntUtils;
  *
  * @author valen
  */
-public class MaquinaVirtual implements Contexto
+public class MaquinaVirtual implements UnidadIO
 {
     private Memoria memoria;
     private Registros registros;
@@ -51,6 +51,7 @@ public class MaquinaVirtual implements Contexto
         return getValorMemoriaModificaReg(dirLogica, cantBytes);
     }
     
+    @Override
     public int getValorMemoriaModificaReg(int dirLogica, int cantBytes) throws SegmentationFaultException
     {
         this.registros.setLAR(dirLogica);
@@ -69,8 +70,37 @@ public class MaquinaVirtual implements Contexto
     }
     
     @Override
-    public void setValor(Operando operando) throws SegmentationFaultException, IllegalArgumentException
+    public void setValor(Operando operando, int valor) throws SegmentationFaultException
     {
-        operando.setValor(this);
+        operando.setValor(this, valor);
+    }
+    
+    public void setValor(OperandoInmediato operando, int valor)
+    {
+        throw new IllegalArgumentException("no se puede colocar un valor a un inmediato");
+    }
+    
+    public void setValor(OperandoRegistro operando, int valor)
+    {
+        this.registros.setValor(operando, valor);
+    }
+    
+    public void setValor(OperandoMemoria operando, int valor) throws SegmentationFaultException
+    {
+        int dirLogica = getValor(operando.getOperandoRegistro()) + operando.getOffset();
+        int cantBytes = 4 - operando.getCodTamanioCelda();
+        setValorMemoriaModifReg(dirLogica, cantBytes, valor);
+    }
+    
+    @Override
+    public void setValorMemoriaModifReg(int dirLogica, int cantBytes, int valor) throws SegmentationFaultException
+    {
+        this.registros.setLAR(dirLogica);
+        int dirFisica = this.tablaSegmentos.getDirFisica(dirLogica, cantBytes);
+        int valorMar = IntUtils.putHigh(0, cantBytes);
+        valorMar = IntUtils.putLow(valorMar, dirFisica);
+        this.registros.setMAR(valorMar);
+        this.registros.setMBR(valor);
+        this.memoria.setValor(dirFisica, cantBytes, valor);
     }
 }

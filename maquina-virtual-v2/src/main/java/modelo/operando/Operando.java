@@ -4,9 +4,8 @@
  */
 package modelo.operando;
 
-import modelo.Contexto;
-import modelo.MaquinaVirtual;
 import modelo.excepciones.SegmentationFaultException;
+import modelo.UnidadIO;
 
 /**
  *
@@ -14,6 +13,6 @@ import modelo.excepciones.SegmentationFaultException;
  */
 public interface Operando
 {
-    public int getValor(Contexto vmx) throws SegmentationFaultException;
-    public int setValor(Contexto vmx) throws SegmentationFaultException, IllegalArgumentException;
+    public int getValor(UnidadIO vmx) throws SegmentationFaultException;
+    public void setValor(UnidadIO vmx, int valor) throws SegmentationFaultException;
 }

@@ -5,8 +5,8 @@
 package modelo.operando;
 
 import modelo.ConstantesRegistros;
-import modelo.Contexto;
 import modelo.excepciones.SegmentationFaultException;
+import modelo.UnidadIO;
 
 /**
  *
@@ -59,15 +59,15 @@ public class OperandoMemoria implements Operando
     }
 
     @Override
-    public int getValor(Contexto vmx) throws SegmentationFaultException
+    public int getValor(UnidadIO vmx) throws SegmentationFaultException
     {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int setValor(Contexto vmx) throws SegmentationFaultException, IllegalArgumentException
+    public void setValor(UnidadIO vmx, int valor) throws SegmentationFaultException
     {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        vmx.setValor(this, valor);
     }
     
 }

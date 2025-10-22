@@ -6,8 +6,8 @@ package modelo.operando;
 
 import javax.naming.OperationNotSupportedException;
 import modelo.ConstantesRegistros;
-import modelo.Contexto;
 import modelo.excepciones.SegmentationFaultException;
+import modelo.UnidadIO;
 
 /**
  *
@@ -49,7 +49,7 @@ public abstract class OperandoRegistro implements Operando
     }
 
     @Override
-    public int getValor(Contexto vmx)
+    public int getValor(UnidadIO vmx)
     {
         int valor = 0;
         try
@@ -63,8 +63,9 @@ public abstract class OperandoRegistro implements Operando
         return valor;
     }
     
-    public int setValor(Contexto vmx) throws SegmentationFaultException, IllegalArgumentException
+    @Override
+    public void setValor(UnidadIO vmx, int valor) throws SegmentationFaultException
     {
-       return 0;
+       vmx.setValor(this, valor);
     }
 }
