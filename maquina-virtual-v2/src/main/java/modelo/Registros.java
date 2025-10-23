@@ -70,6 +70,26 @@ public class Registros
         this.registros[ConstantesRegistros.KS.getCodigo()] = valor;
     }
     
+    public void setPS(int valor)
+    {
+        this.registros[ConstantesRegistros.PS.getCodigo()] = valor;
+    }
+    
+    public void setES(int valor)
+    {
+        this.registros[ConstantesRegistros.ES.getCodigo()] = valor;
+    }
+    
+    public void setSS(int valor)
+    {
+        this.registros[ConstantesRegistros.SS.getCodigo()] = valor;
+    }
+    
+    public void setSP(int valor)
+    {
+        this.registros[ConstantesRegistros.SP.getCodigo()] = valor;
+    }
+    
     public int getMBR()
     {
         return this.registros[ConstantesRegistros.MBR.getCodigo()];
@@ -80,6 +100,31 @@ public class Registros
         return this.registros[ConstantesRegistros.CS.getCodigo()];
     }
 
+    public int getPS()
+    {
+        return this.registros[ConstantesRegistros.PS.getCodigo()];
+    }
+    
+    public int getKS()
+    {
+        return this.registros[ConstantesRegistros.KS.getCodigo()];
+    }
+    
+    public int getES()
+    {
+        return this.registros[ConstantesRegistros.ES.getCodigo()];
+    }
+    
+     public int getSS()
+    {
+        return this.registros[ConstantesRegistros.SS.getCodigo()];
+    }
+     
+      public int getSP()
+    {
+        return this.registros[ConstantesRegistros.SP.getCodigo()];
+    }
+    
     public int[] getRegistros()
     {
         return registros;

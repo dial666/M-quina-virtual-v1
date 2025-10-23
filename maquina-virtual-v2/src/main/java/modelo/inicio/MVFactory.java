@@ -62,6 +62,9 @@ public class MVFactory
                             }
             i++;
         }
+        if (this.params == null)
+            this.params = new String[0];
+        
     }
     
     public IMaquinaVirtual creaMV(String[] args) throws FileNotFoundException, IOException, VMException

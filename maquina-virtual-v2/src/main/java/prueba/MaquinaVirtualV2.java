@@ -29,9 +29,11 @@ public class MaquinaVirtualV2 {
         {
            IMaquinaVirtual mv = mvf.creaMV(args);
             mv.creaImagen();
+            
         } 
         catch (Exception e)
         {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
     }
