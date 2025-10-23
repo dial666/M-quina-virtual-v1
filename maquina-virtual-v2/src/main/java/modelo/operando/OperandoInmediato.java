@@ -20,10 +20,6 @@ public class OperandoInmediato implements Operando
         this.valor = operandoInmediato;
     }
 
-    public int getValor()
-    {
-        return valor;
-    }
 
     @Override
     public String toString()
@@ -34,16 +30,7 @@ public class OperandoInmediato implements Operando
     @Override
     public int getValor(UnidadIO vmx)
     {
-        int val = 0;
-        try
-        {
-            val = vmx.getValor(this);
-        } 
-        catch (SegmentationFaultException e)
-        {
-            throw new IllegalStateException("no deberia ocurrir un segmentation fault en un inmediato");
-        }
-        return val;
+       return vmx.getValor(this);
     }
 
     @Override
@@ -51,5 +38,9 @@ public class OperandoInmediato implements Operando
     {
         vmx.setValor(this, valor);
     }
-    
+
+    public int getValor()
+    {
+        return valor;
+    }
 }

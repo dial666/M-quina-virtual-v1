@@ -6,7 +6,12 @@ package modelo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import modelo.excepciones.SegmentationFaultException;
 import modelo.excepciones.VMException;
+import modelo.operando.Operando;
+import modelo.operando.OperandoInmediato;
+import modelo.operando.OperandoMemoria;
+import modelo.operando.OperandoRegistro;
 
 /**
  *

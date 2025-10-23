@@ -51,16 +51,7 @@ public abstract class OperandoRegistro implements Operando
     @Override
     public int getValor(UnidadIO vmx)
     {
-        int valor = 0;
-        try
-        {
-            valor = vmx.getValor(this);
-        } 
-        catch (SegmentationFaultException e)
-        {
-            throw new IllegalStateException("no deberia ocurrir un segmentation fault en un registro");
-        }
-        return valor;
+        return vmx.getValor(this);
     }
     
     @Override

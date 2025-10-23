@@ -38,19 +38,22 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
     @Override
     public int getValor(Operando operando) throws SegmentationFaultException
     {
-        return operando.getValor(this);
+        throw new IllegalArgumentException("operando desconocido");
     }
 
+    @Override
     public int getValor(OperandoInmediato operando)
     {
         return operando.getValor();
     }
     
+    @Override
     public int getValor(OperandoRegistro operando)
     {
         return this.registros.getValor(operando);
     }
     
+    @Override
     public int getValor(OperandoMemoria operando) throws SegmentationFaultException
     {
         int dirLogica = getValor(operando.getOperandoRegistro()) + operando.getOffset();
@@ -70,6 +73,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
         return this.registros.getMBR();
     }
     
+    @Override
     public int getValorMemoria(int dirLogica, int cantBytes) throws SegmentationFaultException
     {
         int dirFisica = this.tablaSegmentos.getDirFisica(dirLogica, cantBytes);
@@ -82,16 +86,19 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
         operando.setValor(this, valor);
     }
     
+    @Override
     public void setValor(OperandoInmediato operando, int valor)
     {
         throw new IllegalArgumentException("no se puede colocar un valor a un inmediato");
     }
     
+    @Override
     public void setValor(OperandoRegistro operando, int valor)
     {
         this.registros.setValor(operando, valor);
     }
     
+    @Override
     public void setValor(OperandoMemoria operando, int valor) throws SegmentationFaultException
     {
         int dirLogica = getValor(operando.getOperandoRegistro()) + operando.getOffset();

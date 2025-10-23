@@ -61,7 +61,7 @@ public class OperandoMemoria implements Operando
     @Override
     public int getValor(UnidadIO vmx) throws SegmentationFaultException
     {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return vmx.getValor(this);
     }
 
     @Override
