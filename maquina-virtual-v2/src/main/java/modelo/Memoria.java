@@ -36,4 +36,19 @@ public class Memoria
             memoria[dirFisica + i] = (byte) ((valor >> shift) & 0xFF);
          }
     }
+    
+    public void setBloque(int dirFisica, byte[] bloque)
+    {
+        System.arraycopy(bloque, 0, this.memoria, dirFisica, bloque.length);
+    }
+    
+    public int getTamanio()
+    {
+        return this.memoria.length;
+    }
+
+    public byte[] getBytes()
+    {
+        return memoria;
+    }
 }

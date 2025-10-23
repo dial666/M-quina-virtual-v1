@@ -8,7 +8,7 @@ package modelo.excepciones;
  *
  * @author valen
  */
-public class TablaSegmentosLlenaException extends Exception
+public class TablaSegmentosLlenaException extends VMException
 {
 
     public TablaSegmentosLlenaException(String message)

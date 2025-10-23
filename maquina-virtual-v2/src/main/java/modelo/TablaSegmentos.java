@@ -4,6 +4,7 @@
  */
 package modelo;
 
+import java.nio.ByteBuffer;
 import modelo.excepciones.SegmentationFaultException;
 import modelo.excepciones.TablaSegmentosLlenaException;
 import modelo.utils.IntUtils;
@@ -80,6 +81,17 @@ public class TablaSegmentos
     {
         TablaSegmentos.centEntradas = centEntradas;
     }
-            
+
+    public int[] getTablaSegmentos()
+    {
+        return tablaSegmentos;
+    }    
     
+    public byte[] getBytes()
+    {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(this.tablaSegmentos.length * Integer.BYTES);
+        for (int valor: this.tablaSegmentos)
+            byteBuffer.putInt(valor);
+        return byteBuffer.array();
+    }
 }

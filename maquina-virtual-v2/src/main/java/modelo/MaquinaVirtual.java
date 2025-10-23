@@ -4,7 +4,10 @@
  */
 package modelo;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import modelo.excepciones.SegmentationFaultException;
+import modelo.excepciones.VMException;
 import modelo.operando.Operando;
 import modelo.operando.OperandoInmediato;
 import modelo.operando.OperandoMemoria;
@@ -15,17 +18,21 @@ import modelo.utils.IntUtils;
  *
  * @author valen
  */
-public class MaquinaVirtual implements UnidadIO
+public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
 {
     private Memoria memoria;
     private Registros registros;
     private TablaSegmentos tablaSegmentos;
+    private boolean disassembler;
+    private CreadorVMI creadorVMI;
     
-    public MaquinaVirtual(Memoria memoria, Registros registros, TablaSegmentos tablaSegmentos)
+    public MaquinaVirtual(Memoria memoria, Registros registros, TablaSegmentos tablaSegmentos, boolean disassembler, CreadorVMI creadorVMI)
     {
         this.memoria = memoria;
         this.registros = registros;
         this.tablaSegmentos = tablaSegmentos;
+        this.disassembler = disassembler;
+        this.creadorVMI = creadorVMI;
     }
 
     @Override
@@ -102,5 +109,17 @@ public class MaquinaVirtual implements UnidadIO
         this.registros.setMAR(valorMar);
         this.registros.setMBR(valor);
         this.memoria.setValor(dirFisica, cantBytes, valor);
+    }
+
+    @Override
+    public void ejecutar() throws VMException
+    {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    @Override
+    public void creaImagen() throws VMException, FileNotFoundException, IOException
+    {
+        this.creadorVMI.creaImagen(this.memoria.getBytes(), this.registros.getBytes(), this.tablaSegmentos.getBytes());
     }
 }

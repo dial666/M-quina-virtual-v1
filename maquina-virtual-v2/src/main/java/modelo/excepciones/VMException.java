@@ -8,10 +8,10 @@ package modelo.excepciones;
  *
  * @author valen
  */
-public class SegmentationFaultException extends VMException
+public class VMException extends Exception
 {
 
-    public SegmentationFaultException(String message)
+    public VMException(String message)
     {
         super(message);
     }

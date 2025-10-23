@@ -5,6 +5,7 @@
 package modelo;
 
 
+import java.nio.ByteBuffer;
 import modelo.operando.OperandoRegistro;
 
 /**
@@ -49,9 +50,46 @@ public class Registros
         this.registros[ConstantesRegistros.MBR.getCodigo()] = valor;
     }
     
+    public void setCS(int valor)
+    {
+        this.registros[ConstantesRegistros.CS.getCodigo()] = valor;
+    }
+    
+    public void setDS(int valor)
+    {
+        this.registros[ConstantesRegistros.DS.getCodigo()] = valor;
+    }
+    
+    public void setIP(int valor)
+    {
+        this.registros[ConstantesRegistros.IP.getCodigo()] = valor;
+    }
+    
+    public void setKS(int valor)
+    {
+        this.registros[ConstantesRegistros.KS.getCodigo()] = valor;
+    }
+    
     public int getMBR()
     {
         return this.registros[ConstantesRegistros.MBR.getCodigo()];
     }
-        
+    
+    public int getCS()
+    {
+        return this.registros[ConstantesRegistros.CS.getCodigo()];
+    }
+
+    public int[] getRegistros()
+    {
+        return registros;
+    }
+    
+    public byte[] getBytes()
+    {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(this.registros.length * Integer.BYTES);
+        for (int valor: this.registros)
+            byteBuffer.putInt(valor);
+        return byteBuffer.array();
+    }
 }
