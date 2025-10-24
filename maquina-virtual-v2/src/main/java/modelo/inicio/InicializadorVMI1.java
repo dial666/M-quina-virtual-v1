@@ -25,7 +25,6 @@ public class InicializadorVMI1 implements IInicializadorMV
         int tamRegistros = ConstantesRegistros.getCantidadRegistros() * Integer.BYTES;
         int tamTabla = TablaSegmentos.getCantEntradas() * Integer.BYTES;
         ByteBuffer bufferRegistros;
-        ByteBuffer bufferMemoria;
         ByteBuffer bufferTabla;
         ByteBuffer bufferMem;
         int[] arrayRegistros;
@@ -39,11 +38,8 @@ public class InicializadorVMI1 implements IInicializadorMV
         
         byteBufferArch = byteBufferArch.slice();
         bufferRegistros = byteBufferArch.slice(0, tamRegistros);
-        System.out.println(bufferRegistros);
         bufferTabla = byteBufferArch.slice(tamRegistros, tamTabla);
-        System.out.println(bufferTabla);
         bufferMem = byteBufferArch.slice(tamRegistros + tamTabla, tamMemoria);
-        System.out.println(bufferMem);
         
         arrayRegistros = new int[ConstantesRegistros.getCantidadRegistros()];
         for (i = 0; i < ConstantesRegistros.getCantidadRegistros(); i++)
@@ -59,10 +55,6 @@ public class InicializadorVMI1 implements IInicializadorMV
         arrayMemoria = new byte[tamMemoria];
         bufferMem.get(arrayMemoria);
         memoria.setBloque(0, arrayMemoria);
-        
-        System.out.println("memoria:");
-        for (int bytemem: arrayMemoria)
-            System.out.printf("0x%01X%n", bytemem);
     }
     
 }

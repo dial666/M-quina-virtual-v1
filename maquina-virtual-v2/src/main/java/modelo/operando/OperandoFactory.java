@@ -18,11 +18,13 @@ public class OperandoFactory
         
     }
     
-    public Operando creaOperando(int tipo, int operando)
+    public static Operando creaOperando(int operando)
     {
+        int tipo = (operando >> 24) & 0xFF;
         Operando op = null;
         switch (tipo)
         {
+            case 0 -> op = null;
             case 1 ->
             {
                 int codSector = (operando >> 6) & 0b11;
@@ -50,7 +52,7 @@ public class OperandoFactory
             }
             case 2 ->
             {
-                op = new OperandoInmediato(operando);
+                op = new OperandoInmediato(operando & 0xFFFF);
             }
             case 3 ->
             {

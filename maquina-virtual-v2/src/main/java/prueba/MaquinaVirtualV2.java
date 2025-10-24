@@ -30,13 +30,9 @@ public class MaquinaVirtualV2 {
         OperandoFactory of = new OperandoFactory();
         try
         {
-            UnidadIO mv = (MaquinaVirtual) (mvf.creaMV(args));
+           IMaquinaVirtual mv = mvf.creaMV(args);
            
-         /* Operando op1 = of.creaOperando(3, 0xDB0004);
-           System.out.println(op1);
-           Operando op2 = of.creaOperando(2, 0x0002);
-           
-           op1.setValor(mv, op2.getValor(mv));*/
+           mv.ejecutar();
           
            
            mv.creaImagen();

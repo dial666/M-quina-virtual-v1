@@ -24,6 +24,8 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
     private Registros registros;
     private TablaSegmentos tablaSegmentos;
     private boolean disassembler;
+    private boolean pasoAPaso;
+    private boolean debug;
     private CreadorVMI creadorVMI;
     
     public MaquinaVirtual(Memoria memoria, Registros registros, TablaSegmentos tablaSegmentos, boolean disassembler, CreadorVMI creadorVMI)
@@ -33,6 +35,8 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
         this.tablaSegmentos = tablaSegmentos;
         this.disassembler = disassembler;
         this.creadorVMI = creadorVMI;
+        this.debug = creadorVMI.getArchVmi() != null;
+        this.pasoAPaso = false;
     }
 
     @Override
@@ -121,12 +125,60 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
     @Override
     public void ejecutar() throws VMException
     {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Instruccion instruccion;
+        while (IPValido())
+        {
+            instruccion = leerInstruccion();
+            instruccion.ejecutar(this);
+        }
     }
     
     @Override
     public void creaImagen() throws VMException, FileNotFoundException, IOException
     {
         this.creadorVMI.creaImagen(this.memoria.getBytes(), this.registros.getBytes(), this.tablaSegmentos.getBytes());
+    }
+    
+    protected boolean IPValido()
+    {
+        boolean cumple = true;
+        if (registros.getIP() == -1)
+            cumple = false;
+        else
+            try
+            {
+                int dirFisica = tablaSegmentos.getDirFisica(registros.getIP(), 1);
+            } 
+            catch (SegmentationFaultException e)
+            {
+                cumple = false;
+            }
+        return cumple;
+    }
+    
+    protected Instruccion leerInstruccion() throws SegmentationFaultException, VMException
+    {
+        int ins = getValorMemoria(registros.getIP(), 1);
+        int tipo1 = (ins >> 6) & 0b11;
+        int tipo2 = (ins >> 4) & 0b11;
+        registros.setOPC(ins & 0x1F);
+        registros.setOP1(getValorMemoria(registros.getIP()+1, tipo1));
+        registros.setOP2(getValorMemoria(registros.getIP()+1+tipo1, tipo2));
+        //aca mostrar los bytes leidos de memoria
+        registros.setOP1((registros.getOP1() & 0x00FFFFFF) | (tipo1 << 24));
+        registros.setOP2((registros.getOP2() & 0x00FFFFFF) | (tipo2 << 24));
+        registros.setIP(registros.getIP() + 1 + tipo1 + tipo2);
+        
+        if (tipo2 != 0)
+        {
+            int temp = registros.getOP1();
+            registros.setOP1(registros.getOP2());
+            registros.setOP2(temp);
+        }
+        
+        Instruccion instruccion = new Instruccion(registros.getOPC(), registros.getOP1(), registros.getOP2());
+        //aca hacer to string de la isntruccion si hay disassembler
+        System.out.println(instruccion.toString());
+        return instruccion;
     }
 }

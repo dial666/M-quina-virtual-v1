@@ -21,5 +21,10 @@ public abstract class CreadorVMI
         this.archVmi = archVmi;
     }
     
+    public String getArchVmi()
+    {
+        return archVmi;
+    }
+    
     public abstract void creaImagen(byte[] memoria, byte[] registros, byte[] tablaSegmentos) throws VMException, FileNotFoundException, IOException;
 }

@@ -55,7 +55,7 @@ public abstract class OperandoRegistro implements Operando
     }
     
     @Override
-    public void setValor(UnidadIO vmx, int valor) throws SegmentationFaultException
+    public void setValor(UnidadIO vmx, int valor)
     {
        vmx.setValor(this, valor);
     }

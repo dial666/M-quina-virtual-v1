@@ -16,7 +16,7 @@ public enum ConstantesRegistros
     IP(3),
     OPC(4),
     OP1(5),
-    OP2(5),
+    OP2(6),
     SP(7),
     BP(8),
     EAX(10),

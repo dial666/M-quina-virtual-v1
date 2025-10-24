@@ -90,6 +90,21 @@ public class Registros
         this.registros[ConstantesRegistros.SP.getCodigo()] = valor;
     }
     
+    public void setOPC(int valor)
+    {
+        this.registros[ConstantesRegistros.OPC.getCodigo()] = valor;
+    }
+    
+    public void setOP1(int valor)
+    {
+        this.registros[ConstantesRegistros.OP1.getCodigo()] = valor;
+    }
+    
+    public void setOP2(int valor)
+    {
+        this.registros[ConstantesRegistros.OP2.getCodigo()] = valor;
+    }
+    
     public int getMBR()
     {
         return this.registros[ConstantesRegistros.MBR.getCodigo()];
@@ -125,6 +140,26 @@ public class Registros
         return this.registros[ConstantesRegistros.SP.getCodigo()];
     }
     
+    public int getIP()
+    {
+        return this.registros[ConstantesRegistros.IP.getCodigo()];
+    }
+    
+    public int getOPC()
+    {
+        return this.registros[ConstantesRegistros.OPC.getCodigo()];
+    }
+    
+    public int getOP1()
+    {
+        return this.registros[ConstantesRegistros.OP1.getCodigo()];
+    }
+    
+    public int getOP2()
+    {
+        return this.registros[ConstantesRegistros.OP2.getCodigo()];
+    }
+      
     public int[] getRegistros()
     {
         return registros;
