@@ -15,7 +15,7 @@ public class OperandoRegistroH extends OperandoRegistro
 
     public OperandoRegistroH(int codRegistro)
     {
-        super(codRegistro, 0xFF, 8, 16);
+        super(codRegistro, 0xFF, 8, 16, 0xFFFF00FF);
     }
 
     @Override

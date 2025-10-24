@@ -1,2 +1,2 @@
-add eax, 3
-add eax, 5
+mov eax, 512
+shl eax, 1

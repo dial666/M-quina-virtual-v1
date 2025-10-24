@@ -35,7 +35,9 @@ public class Instruccion
     @Override
     public String toString()
     {
-        String cadena = op.toString() + " " + opA.toString();
+        String cadena = op.toString();
+        if (opA != null)
+            cadena += " " + opA.toString();
         if (opB != null)
             cadena += ", " + opB.toString();
         return cadena;

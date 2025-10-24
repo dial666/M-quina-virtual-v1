@@ -2,26 +2,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package modelo.operacion.operacionbinaria;
+package modelo.operacion.sys.parser;
+
+import modelo.operacion.sys.parser.IStringToNumberParser;
 
 /**
  *
  * @author valen
  */
-public class Mul extends OperacionBinaria
+public class StrToNmbBinario implements IStringToNumberParser
 {
 
     @Override
-    public int cuenta(int valorA, int valorB)
+    public int StringToNumber(String cadena)
     {
-        return valorA * valorB;
+        return Integer.parseInt(cadena, 2);
     }
-
-    @Override
-    public String toString()
-    {
-        return "MUL";
-    }
-    
     
 }

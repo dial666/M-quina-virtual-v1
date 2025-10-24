@@ -2,26 +2,29 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package modelo.operacion.operacionbinaria;
+package modelo.operacion;
+
+import modelo.UnidadIO;
+import modelo.excepciones.VMException;
+import modelo.operando.Operando;
 
 /**
  *
  * @author valen
  */
-public class Mul extends OperacionBinaria
+public class Mov implements IOperacion
 {
 
     @Override
-    public int cuenta(int valorA, int valorB)
+    public void ejecutar(Operando opA, Operando opB, UnidadIO mv) throws VMException
     {
-        return valorA * valorB;
+        opA.setValor(mv, opB.getValor(mv));
     }
 
     @Override
     public String toString()
     {
-        return "MUL";
+        return "MOV";
     }
-    
-    
+
 }

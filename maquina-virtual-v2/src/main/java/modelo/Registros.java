@@ -32,6 +32,7 @@ public class Registros
     {
         valor &= operando.getMask();
         valor <<= operando.getShift();
+        this.registros[operando.getCodRegistro()] &= operando.getMaskInicializa();
         this.registros[operando.getCodRegistro()] |= valor;
     }
     

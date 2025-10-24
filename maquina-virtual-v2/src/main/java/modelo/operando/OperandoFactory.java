@@ -6,6 +6,7 @@ package modelo.operando;
 
 import modelo.excepciones.SegmentationFaultException;
 import modelo.UnidadIO;
+import modelo.utils.IntUtils;
 
 /**
  *
@@ -52,7 +53,7 @@ public class OperandoFactory
             }
             case 2 ->
             {
-                op = new OperandoInmediato(operando & 0xFFFF);
+                op = new OperandoInmediato(IntUtils.getLowSigned(operando));
             }
             case 3 ->
             {

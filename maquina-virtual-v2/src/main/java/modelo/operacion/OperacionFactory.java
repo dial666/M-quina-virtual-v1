@@ -6,6 +6,8 @@ package modelo.operacion;
 
 import modelo.excepciones.VMException;
 import modelo.operacion.jump.OperacionJumpFactory;
+import modelo.operacion.load.Ldh;
+import modelo.operacion.load.Ldl;
 import modelo.operacion.operacionbinaria.OperacionBinariaFactory;
 
 /**
@@ -23,6 +25,18 @@ public class OperacionFactory
         else
             if (codOP >= 0x01 && codOP <= 0x07)
                 op =  OperacionJumpFactory.creaOperacionJump(codOP);
+            else
+                op = switch (codOP)
+                {
+                    case 0x10 -> new Mov();
+                    case 0x1C -> new Swap();
+                    case 0x1D -> new Ldl();
+                    case 0x1E -> new Ldh();
+                    case 0x1F -> new Rnd();
+                    case 0x08 -> new Not();
+                    case 0x0F -> new Stop();
+                    default -> throw new VMException("codigo de operacion desconocido");
+                };
         
         return op;
     }

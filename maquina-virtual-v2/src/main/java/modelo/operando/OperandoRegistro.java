@@ -19,13 +19,15 @@ public abstract class OperandoRegistro implements Operando
     private int mask;
     private int shift;
     private int shiftExtensionSigno;
+    private int maskInicializa;
     
-    public OperandoRegistro(int codRegistro, int mask, int shift, int shiftExtensionSigno)
+    public OperandoRegistro(int codRegistro, int mask, int shift, int shiftExtensionSigno, int maskInicializa)
     {
         this.codRegistro = codRegistro;
         this.mask = mask;
         this.shift = shift;
         this.shiftExtensionSigno = shiftExtensionSigno;
+        this.maskInicializa = maskInicializa;
     }
     
     public int getCodRegistro()
@@ -46,6 +48,11 @@ public abstract class OperandoRegistro implements Operando
     public int getShiftExtensionSigno()
     {
         return shiftExtensionSigno;
+    }
+
+    public int getMaskInicializa()
+    {
+        return maskInicializa;
     }
 
     @Override

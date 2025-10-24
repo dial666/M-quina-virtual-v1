@@ -2,26 +2,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package modelo.operacion.operacionbinaria;
+package modelo.operacion.sys.parser;
 
 /**
  *
  * @author valen
  */
-public class Mul extends OperacionBinaria
+public class NmbToStrOctal implements INumberToStringParser
 {
 
     @Override
-    public int cuenta(int valorA, int valorB)
+    public String numberToString(int num, int tamCelda)
     {
-        return valorA * valorB;
+        return "0o" + Integer.toOctalString(num);
     }
-
-    @Override
-    public String toString()
-    {
-        return "MUL";
-    }
-    
     
 }
