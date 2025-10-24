@@ -137,4 +137,9 @@ public class Registros
             byteBuffer.putInt(valor);
         return byteBuffer.array();
     }
+
+    public void setRegistros(int[] registros)
+    {
+        this.registros = registros;
+    }
 }

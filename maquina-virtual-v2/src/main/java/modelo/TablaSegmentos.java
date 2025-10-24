@@ -15,14 +15,14 @@ import modelo.utils.IntUtils;
  */
 public class TablaSegmentos
 {
-    private static int centEntradas = 8;
+    private static int cantEntradas = 8;
     private int[] tablaSegmentos;
     
     public TablaSegmentos()
     {
-        this.tablaSegmentos = new int[TablaSegmentos.getCentEntradas()];
+        this.tablaSegmentos = new int[TablaSegmentos.getCantEntradas()];
         
-        for (int i = 0; i < TablaSegmentos.getCentEntradas(); i++) 
+        for (int i = 0; i < TablaSegmentos.getCantEntradas(); i++) 
         {
             this.tablaSegmentos[i] = -1;
         }   
@@ -33,7 +33,7 @@ public class TablaSegmentos
         int indiceTabla = IntUtils.getHighSigned(dirLogica);
         int offset = IntUtils.getLowSigned(dirLogica);
         
-        if (indiceTabla < 0 || indiceTabla >= TablaSegmentos.getCentEntradas() || this.tablaSegmentos[indiceTabla] == -1)
+        if (indiceTabla < 0 || indiceTabla >= TablaSegmentos.getCantEntradas() || this.tablaSegmentos[indiceTabla] == -1)
             throw new SegmentationFaultException("segmentation fault");
         
         int dirBase = IntUtils.getHighUnsigned(this.tablaSegmentos[indiceTabla]);
@@ -54,7 +54,7 @@ public class TablaSegmentos
     public int agregarEntrada(int tamSegmento) throws  TablaSegmentosLlenaException
     {
         int i = 0;
-        int n = TablaSegmentos.getCentEntradas();
+        int n = TablaSegmentos.getCantEntradas();
         while (i < n && this.tablaSegmentos[i] != -1)
             i++;
         
@@ -72,14 +72,14 @@ public class TablaSegmentos
          return i;
     }
 
-    public static int getCentEntradas()
+    public static int getCantEntradas()
     {
-        return centEntradas;
+        return cantEntradas;
     }
 
     public static void setCentEntradas(int centEntradas)
     {
-        TablaSegmentos.centEntradas = centEntradas;
+        TablaSegmentos.cantEntradas = centEntradas;
     }
 
     public int[] getTablaSegmentos()
@@ -93,5 +93,10 @@ public class TablaSegmentos
         for (int valor: this.tablaSegmentos)
             byteBuffer.putInt(valor);
         return byteBuffer.array();
+    }
+
+    public void setTablaSegmentos(int[] tablaSegmentos)
+    {
+        this.tablaSegmentos = tablaSegmentos;
     }
 }

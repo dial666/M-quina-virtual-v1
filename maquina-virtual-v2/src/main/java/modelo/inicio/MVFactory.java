@@ -75,25 +75,37 @@ public class MVFactory
         if (this.tamMemoria < 0)
             throw new VMException("tamanio de memoria invalido");
         
-        if (this.archVmx != null)
-        {         
-            InputStream inputStream = new FileInputStream(this.archVmx);
-            ByteBuffer byteBufferArchivo = ByteBuffer.wrap(inputStream.readAllBytes());
-            inputStream.close();
-            
-            int version = byteBufferArchivo.get(5);
-            this.inicializador = switch (version)
-            {
-                case 1 -> new InicializadorMV1();
-                case 2 -> new InicializadorMV2();
-                default -> throw new VMException("version de archivo .vmx desconocida");
-            };
-            
-            byteBufferArchivo.position(6);
+        if (this.archVmx != null || this.archVmi != null)
+        {
             Memoria m = new Memoria(this.tamMemoria);
             Registros r = new Registros();
             TablaSegmentos t = new TablaSegmentos();
+            ByteBuffer byteBufferArchivo = null;
+            if (this.archVmx != null)
+            {         
+                InputStream inputStream = new FileInputStream(this.archVmx);
+                byteBufferArchivo = ByteBuffer.wrap(inputStream.readAllBytes());
+                inputStream.close();
+
+                int version = byteBufferArchivo.get(5);
+                this.inicializador = switch (version)
+                {
+                    case 1 -> new InicializadorMV1();
+                    case 2 -> new InicializadorMV2();
+                    default -> throw new VMException("version de archivo .vmx desconocida");
+                };
+            }
+            else
+                if (this.archVmi != null)
+                {
+                    InputStream inputStream = new FileInputStream(this.archVmi); 
+                    byteBufferArchivo = ByteBuffer.wrap(inputStream.readAllBytes());
+                    inputStream.close();
+                    
+                    this.inicializador = new InicializadorVMI1();
+                }
             
+            byteBufferArchivo.position(6);
             this.inicializador.inicializa(m, r, t, params, byteBufferArchivo.slice());
             mv = new MaquinaVirtual(m, r, t, this.disassembler, new CreadorVMI1(this.archVmi));
         }
