@@ -4,21 +4,8 @@
 
 package prueba;
 
-import java.rmi.dgc.VMID;
 import modelo.IMaquinaVirtual;
-import modelo.MaquinaVirtual;
-import modelo.Memoria;
-import modelo.Registros;
-import modelo.UnidadIO;
 import modelo.inicio.MVFactory;
-import modelo.operando.Operando;
-import modelo.operando.OperandoFactory;
-import modelo.operando.OperandoRegistro;
-import modelo.operando.OperandoRegistroE;
-import modelo.operando.OperandoRegistroH;
-import modelo.operando.OperandoRegistroL;
-import modelo.operando.OperandoRegistroX;
-import modelo.utils.IntUtils;
 
 /**
  *

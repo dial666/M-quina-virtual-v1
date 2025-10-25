@@ -8,7 +8,7 @@ package modelo.operacion.sys.parser;
  *
  * @author valen
  */
-public class NmbToStrCaracter implements INumberToStringParser
+public abstract class NmbToStrCaracter implements INumberToStringParser
 {
 
     @Override
@@ -20,7 +20,7 @@ public class NmbToStrCaracter implements INumberToStringParser
         for(int i =tamCelda-1; i>=0; i--)
         {
             byteaux = (num >> (i*8)) & 0xFF;
-            if (byteaux >= 32 && byteaux <= 126)
+            if (condicionMostrarCar(byteaux))
                 cadena += (char)(byteaux);
             else
                 cadena += ".";
@@ -28,4 +28,5 @@ public class NmbToStrCaracter implements INumberToStringParser
         return cadena;
     }
     
+    public abstract boolean condicionMostrarCar(int num);
 }

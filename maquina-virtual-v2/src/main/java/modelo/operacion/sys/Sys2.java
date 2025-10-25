@@ -13,6 +13,7 @@ import modelo.operacion.sys.parser.NmbToStrCaracter;
 import modelo.operacion.sys.parser.NmbToStrDecimal;
 import modelo.operacion.sys.parser.NmbToStrHexadecimal;
 import modelo.operacion.sys.parser.NmbToStrOctal;
+import modelo.operacion.sys.parser.NmbToStringCaracterNoMuestra0;
 
 /**
  *
@@ -35,7 +36,7 @@ public class Sys2 extends OperacionSysSimple
         if ((modo & 0x04) != 0)
             this.parsers.add(new NmbToStrOctal());
         if ((modo & 0x02) != 0)
-            this.parsers.add(new NmbToStrCaracter());
+            this.parsers.add(new NmbToStringCaracterNoMuestra0());
         if ((modo & 0x01) != 0)
             this.parsers.add(new NmbToStrDecimal());
         if ((modo & 0x10) != 0)

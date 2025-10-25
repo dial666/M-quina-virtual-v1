@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.util.Scanner;
 import modelo.excepciones.SegmentationFaultException;
 import modelo.excepciones.VMException;
+import modelo.operacion.sys.parser.INumberToStringParser;
+import modelo.operacion.sys.parser.NmbToStrCaracter;
+import modelo.operacion.sys.parser.NmbToStrHexadecimal;
+import modelo.operacion.sys.parser.NmbToStringCaracterMuestra0;
 import modelo.operando.Operando;
 import modelo.operando.OperandoInmediato;
 import modelo.operando.OperandoMemoria;
@@ -131,6 +135,12 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     {
         Instruccion instruccion;
         Debugger debugger = new Debugger();
+        if (this.disassembler == true)
+        {
+            mostrarKS();
+            System.out.print(">");
+        }
+  
         while (registros.getIP() != -1)
         {          
             instruccion = leerInstruccion();
@@ -182,7 +192,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         if (this.disassembler == true)
         {
             String hexa = IntUtils.getHexFormat(1, ins) + IntUtils.getHexFormat(tipo2, registros.getOP2()) + IntUtils.getHexFormat(tipo1, registros.getOP1());
-            hexa += StringUtils.getEspacios(20, hexa);
+            hexa += StringUtils.getEspacios(22, hexa);
             System.out.printf("[%04X]:%s| %s %n", dirFisica, hexa, instruccion);
         }
         
@@ -226,5 +236,39 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         return scanner;
     }
     
-    
+    protected void mostrarKS()
+    {
+        int dirFisica;
+        int i;
+        int dirLogica = registros.getKS();
+        int leido;
+        INumberToStringParser parserCar = new NmbToStringCaracterMuestra0();
+        String hexa;
+        String cadena;
+        try
+        {
+            while (true)
+            {
+                dirFisica = getPreviewDirFisica(dirLogica);
+                i = 0;
+                cadena = hexa = "";
+                do
+                {                    
+                 leido = getValorMemoria(dirLogica, 1);  
+                 hexa += IntUtils.getHexFormat(1, leido);
+                 cadena += parserCar.numberToString(leido, 1);
+                 i++;
+                 dirLogica++;
+                } while (i < 7 && leido != 0);
+                
+                if (i == 7)
+                    cadena += "...";
+                hexa += StringUtils.getEspacios(22, hexa);
+                System.out.printf("[%04X]:%s| \"%s\" %n", dirFisica, hexa, cadena);
+            }
+        } 
+        catch (SegmentationFaultException e)
+        {
+        }
+    }
 }
