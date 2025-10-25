@@ -10,5 +10,11 @@ package modelo.operacion.sys.parser;
  */
 public class NmbToStrBinario implements INumberToStringParser
 {
+
+    @Override
+    public String numberToString(int num, int tamCelda)
+    {
+        return "0b" + Integer.toBinaryString(num);
+    }
     
 }

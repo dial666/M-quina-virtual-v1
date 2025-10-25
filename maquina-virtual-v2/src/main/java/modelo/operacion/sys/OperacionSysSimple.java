@@ -31,8 +31,14 @@ public abstract class OperacionSysSimple implements IOperacion
         if (tamCelda > 4 || tamCelda < 0 )
             throw new VMException("el tamanio de celda de memoria es invalido");
         
-        for (int i = 0; i < tamCelda; i++)
+        setParser(modo);
+        for (int i = 0; i < cantCeldas; i++)
+        {
+            manipularMem(dirLogica, tamCelda, mv);
+            dirLogica += tamCelda;
+        }
     }
     
-    public abstract manipularMem(int dirLogica, int tamCelda);
+    public abstract void setParser(int modo) throws VMException;
+    public abstract void manipularMem(int dirLogica, int tamCelda, UnidadIO mv) throws VMException;
 }

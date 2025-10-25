@@ -9,6 +9,7 @@ import modelo.operacion.jump.OperacionJumpFactory;
 import modelo.operacion.load.Ldh;
 import modelo.operacion.load.Ldl;
 import modelo.operacion.operacionbinaria.OperacionBinariaFactory;
+import modelo.operacion.sys.OperacionSys;
 
 /**
  *
@@ -35,6 +36,7 @@ public class OperacionFactory
                     case 0x1F -> new Rnd();
                     case 0x08 -> new Not();
                     case 0x0F -> new Stop();
+                    case 0x00 -> new OperacionSys();
                     default -> throw new VMException("codigo de operacion desconocido");
                 };
         

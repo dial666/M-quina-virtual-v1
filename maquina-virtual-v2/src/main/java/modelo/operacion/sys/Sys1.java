@@ -4,6 +4,9 @@
  */
 package modelo.operacion.sys;
 
+import java.util.Scanner;
+import modelo.UnidadIO;
+import modelo.excepciones.SegmentationFaultException;
 import modelo.excepciones.VMException;
 import modelo.operacion.sys.parser.IStringToNumberParser;
 import modelo.operacion.sys.parser.StrToNmbBinario;
@@ -19,9 +22,15 @@ import modelo.operacion.sys.parser.StrToNmbOctal;
 public class Sys1 extends OperacionSysSimple
 {
     IStringToNumberParser parser;
+    Scanner scanner;
+
+    public Sys1()
+    {
+        this.scanner = new Scanner(System.in);
+    }
     
     @Override
-    public void setParser(int modo) throw VMException
+    public void setParser(int modo) throws VMException
     {
         this.parser = switch (modo)
         {
@@ -35,9 +44,9 @@ public class Sys1 extends OperacionSysSimple
     }
 
     @Override
-    public void manipularMem(int dirLogica, int tamCelda)
+    public void manipularMem(int dirLogica, int tamCelda, UnidadIO mv) throws VMException
     {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        mv.setValorMemoriaModifReg(dirLogica, tamCelda, parser.StringToNumber(scanner.nextLine()));
     }
     
 }

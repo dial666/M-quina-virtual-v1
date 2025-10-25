@@ -10,5 +10,11 @@ package modelo.operacion.sys.parser;
  */
 public class NmbToStrDecimal implements INumberToStringParser
 {
+
+    @Override
+    public String numberToString(int num, int tamCelda)
+    {
+        return "" + num;
+    }
     
 }

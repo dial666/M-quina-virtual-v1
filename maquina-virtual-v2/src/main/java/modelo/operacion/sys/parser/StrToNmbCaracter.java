@@ -10,5 +10,15 @@ package modelo.operacion.sys.parser;
  */
 public class StrToNmbCaracter implements IStringToNumberParser
 {
+
+    @Override
+    public int StringToNumber(String cadena)
+    {
+        int n = cadena.length();
+        int num = 0;
+        for (int i = 0; i < n; i++)
+          num = (num << 8) | (byte) (cadena.charAt(i));
+        return num;
+    }
     
 }

@@ -12,7 +12,7 @@ public class NmbToStrHexadecimal implements INumberToStringParser
 {
 
     @Override
-    public String numberToString(int num)
+    public String numberToString(int num, int tamCelda)
     {
         return "0x" + Integer.toHexString(num).toUpperCase();
     }
