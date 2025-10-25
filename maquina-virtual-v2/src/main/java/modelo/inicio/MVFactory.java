@@ -109,7 +109,8 @@ public class MVFactory
             this.inicializador.inicializa(m, r, t, params, byteBufferArchivo.slice());
             mv = new MaquinaVirtual(m, r, t, this.disassembler, new CreadorVMI1(this.archVmi));
         }
-        
+        else
+            throw new VMException("no se proporcion ningun .vmx o .vmi");
         return mv;
     }
 }
