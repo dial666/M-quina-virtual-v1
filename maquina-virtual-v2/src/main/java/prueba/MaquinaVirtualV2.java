@@ -27,16 +27,11 @@ public class MaquinaVirtualV2 {
 
     public static void main(String[] args) {
         MVFactory mvf = new MVFactory();
-        OperandoFactory of = new OperandoFactory();
         try
         {
            IMaquinaVirtual mv = mvf.creaMV(args);
            
-           mv.ejecutar();
-          
-           
-           mv.creaImagen();
-            
+           mv.ejecutar();       
         } 
         catch (Exception e)
         {

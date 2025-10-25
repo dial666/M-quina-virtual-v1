@@ -6,18 +6,19 @@ package modelo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import modelo.excepciones.SegmentationFaultException;
+import java.util.Scanner;
 import modelo.excepciones.VMException;
-import modelo.operando.Operando;
-import modelo.operando.OperandoInmediato;
-import modelo.operando.OperandoMemoria;
-import modelo.operando.OperandoRegistro;
 
 /**
  *
  * @author valen
  */
-public interface IMaquinaVirtual
+public interface IDebuggeable
 {
-    public void ejecutar() throws VMException, IOException;
+    public boolean isPasoAPaso();
+    public boolean isAtenderDebugger();
+    public void setPasoAPaso(boolean pasoAPaso);
+    public void setBreakpoint(boolean breakpoint);
+    public void creaImagen() throws VMException, FileNotFoundException, IOException;
+    public Scanner getScanner();
 }

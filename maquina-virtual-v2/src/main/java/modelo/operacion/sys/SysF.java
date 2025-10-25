@@ -4,7 +4,11 @@
  */
 package modelo.operacion.sys;
 
+import java.io.IOException;
+import java.util.Scanner;
+import modelo.IDebuggeable;
 import modelo.UnidadIO;
+import modelo.excepciones.QuitException;
 import modelo.excepciones.VMException;
 import modelo.operacion.IOperacion;
 import modelo.operando.Operando;
@@ -13,29 +17,13 @@ import modelo.operando.Operando;
  *
  * @author valen
  */
-public class OperacionSys implements IOperacion
-{
-    IOperacion operacion;
-
+public class SysF implements IOperacion
+{    
     @Override
     public void ejecutar(Operando opA, Operando opB, UnidadIO mv) throws VMException
     {
-        int tipoSys = opA.getValor(mv);
-        this.operacion = switch (tipoSys)
-        {
-            case 1 -> new Sys1();
-            case 2 -> new Sys2();
-            case 0xF -> new SysF();
-            default -> throw new VMException("tipo de sys desconocido");
-        };
-        this.operacion.ejecutar(opA, opB, mv);
-    }
-
-    @Override
-    public String toString()
-    {
-        return "SYS";
-    }
-    
-    
+        IDebuggeable mvaux = (IDebuggeable) mv;
+        if (mvaux.isAtenderDebugger())
+            mvaux.setBreakpoint(true);
+    }    
 }

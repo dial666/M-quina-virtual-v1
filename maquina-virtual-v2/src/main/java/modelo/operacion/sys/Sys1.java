@@ -22,12 +22,6 @@ import modelo.operacion.sys.parser.StrToNmbOctal;
 public class Sys1 extends OperacionSysSimple
 {
     IStringToNumberParser parser;
-    Scanner scanner;
-
-    public Sys1()
-    {
-        this.scanner = new Scanner(System.in);
-    }
     
     @Override
     public void setParser(int modo) throws VMException
@@ -46,7 +40,7 @@ public class Sys1 extends OperacionSysSimple
     @Override
     public void manipularMem(int dirLogica, int tamCelda, UnidadIO mv) throws VMException
     {
-        mv.setValorMemoriaModifReg(dirLogica, tamCelda, parser.StringToNumber(scanner.nextLine()));
+        mv.setValorMemoriaModifReg(dirLogica, tamCelda, parser.StringToNumber(mv.getScanner().nextLine()));
     }
     
 }

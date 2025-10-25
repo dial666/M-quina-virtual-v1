@@ -6,6 +6,7 @@ package modelo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 import modelo.excepciones.SegmentationFaultException;
 import modelo.excepciones.VMException;
 import modelo.operando.Operando;
@@ -18,15 +19,17 @@ import modelo.utils.IntUtils;
  *
  * @author valen
  */
-public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
+public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
 {
     private Memoria memoria;
     private Registros registros;
     private TablaSegmentos tablaSegmentos;
     private boolean disassembler;
     private boolean pasoAPaso;
-    private boolean debug;
+    private boolean atenderDebugger;
+    private boolean breakpoint;
     private CreadorVMI creadorVMI;
+    private Scanner scanner;
     
     public MaquinaVirtual(Memoria memoria, Registros registros, TablaSegmentos tablaSegmentos, boolean disassembler, CreadorVMI creadorVMI)
     {
@@ -35,8 +38,9 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
         this.tablaSegmentos = tablaSegmentos;
         this.disassembler = disassembler;
         this.creadorVMI = creadorVMI;
-        this.debug = creadorVMI.getArchVmi() != null;
-        this.pasoAPaso = false;
+        this.atenderDebugger = creadorVMI.getArchVmi() != null;
+        this.pasoAPaso = this.breakpoint = false;
+        this.scanner = new Scanner(System.in);
     }
 
     @Override
@@ -77,7 +81,6 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
         return this.registros.getMBR();
     }
     
-    @Override
     public int getValorMemoria(int dirLogica, int cantBytes) throws SegmentationFaultException
     {
         int dirFisica = this.tablaSegmentos.getDirFisica(dirLogica, cantBytes);
@@ -123,13 +126,17 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
     }
 
     @Override
-    public void ejecutar() throws VMException
+    public void ejecutar() throws VMException, IOException
     {
         Instruccion instruccion;
+        Debugger debugger = new Debugger();
         while (IPValido())
-        {
+        {          
             instruccion = leerInstruccion();
             instruccion.ejecutar(this);
+            
+            if (this.breakpoint == true || this.pasoAPaso == true)
+                debugger.ejecutar(this);
         }
     }
     
@@ -182,8 +189,42 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
         return instruccion;
     }
 
+    @Override
     public int getPreviewDirFisica(int dirLogica) throws SegmentationFaultException
     {
         return this.tablaSegmentos.getDirFisica(dirLogica, 1);
     }
+
+    @Override
+    public boolean isPasoAPaso()
+    {
+        return this.pasoAPaso;
+    }
+
+    @Override
+    public boolean isAtenderDebugger()
+    {
+        return this.atenderDebugger;
+    }
+
+    @Override
+    public void setPasoAPaso(boolean pasoAPaso)
+    {
+        this.pasoAPaso = pasoAPaso;
+    }
+
+    @Override
+    public void setBreakpoint(boolean breakpoint)
+    {
+        this.breakpoint = breakpoint;
+    }
+
+
+    @Override
+    public Scanner getScanner()
+    {
+        return scanner;
+    }
+    
+    
 }
