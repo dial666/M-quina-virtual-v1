@@ -37,6 +37,10 @@ public class OperacionFactory
                     case 0x08 -> new Not();
                     case 0x0F -> new Stop();
                     case 0x00 -> new OperacionSys();
+                    case 0x0B -> new Push();
+                    case 0x0C -> new Pop();
+                    case 0x0D -> new Call();
+                    case 0x0E -> new Ret();
                     default -> throw new VMException("codigo de operacion desconocido");
                 };
         
