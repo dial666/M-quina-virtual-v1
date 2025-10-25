@@ -31,6 +31,6 @@ public interface UnidadIO
     public void setValor(OperandoRegistro operando, int valor);
     public void setValor(OperandoMemoria operando, int valor) throws SegmentationFaultException;
     public void setValorMemoriaModifReg(int dirLogica, int cantBytes, int valor) throws SegmentationFaultException;
-    
+    public int getPreviewDirFisica(int dirLogica) throws SegmentationFaultException;
     public void creaImagen() throws VMException, FileNotFoundException, IOException;
 }

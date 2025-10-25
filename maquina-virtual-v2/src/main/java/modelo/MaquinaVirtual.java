@@ -147,7 +147,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
         else
             try
             {
-                int dirFisica = tablaSegmentos.getDirFisica(registros.getIP(), 1);
+                int dirFisica = getPreviewDirFisica(this.registros.getIP());
             } 
             catch (SegmentationFaultException e)
             {
@@ -180,5 +180,10 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual
         //aca hacer to string de la isntruccion si hay disassembler
         System.out.println(instruccion.toString());
         return instruccion;
+    }
+
+    public int getPreviewDirFisica(int dirLogica) throws SegmentationFaultException
+    {
+        return this.tablaSegmentos.getDirFisica(dirLogica, 1);
     }
 }

@@ -10,6 +10,7 @@ import modelo.excepciones.VMException;
 import modelo.operacion.IOperacion;
 import modelo.operando.Operando;
 import modelo.operando.OperandoRegistroE;
+import modelo.operando.OperandoRegistroH;
 import modelo.utils.IntUtils;
 
 /**
@@ -27,6 +28,7 @@ public abstract class OperacionSysSimple implements IOperacion
         int modo = new OperandoRegistroE(ConstantesRegistros.EAX.getCodigo()).getValor(mv);
         int cantCeldas = IntUtils.getLowUnsigned(valorOpECX);
         int tamCelda = IntUtils.getHighUnsigned(valorOpECX);
+        Operando opMAR = new OperandoRegistroE(ConstantesRegistros.MAR.getCodigo());
         
         if (tamCelda > 4 || tamCelda < 0 )
             throw new VMException("el tamanio de celda de memoria es invalido");
@@ -34,6 +36,7 @@ public abstract class OperacionSysSimple implements IOperacion
         setParser(modo);
         for (int i = 0; i < cantCeldas; i++)
         {
+            System.out.printf("[%04X]: ", mv.getPreviewDirFisica(dirLogica));
             manipularMem(dirLogica, tamCelda, mv);
             dirLogica += tamCelda;
         }

@@ -50,7 +50,7 @@ public class Sys2 extends OperacionSysSimple
         int valor = mv.getValorMemoriaModificaReg(dirLogica, tamCelda);
         String cadena = "";
         for (INumberToStringParser parser: this.parsers)
-            cadena += " " + parser.numberToString(valor, tamCelda);
+            cadena += parser.numberToString(valor, tamCelda) + " ";
         System.out.println(cadena);
     }
     
