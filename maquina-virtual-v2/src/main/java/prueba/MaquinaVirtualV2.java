@@ -18,6 +18,7 @@ import modelo.operando.OperandoRegistroE;
 import modelo.operando.OperandoRegistroH;
 import modelo.operando.OperandoRegistroL;
 import modelo.operando.OperandoRegistroX;
+import modelo.utils.IntUtils;
 
 /**
  *
@@ -31,7 +32,8 @@ public class MaquinaVirtualV2 {
         {
            IMaquinaVirtual mv = mvf.creaMV(args);
            
-           mv.ejecutar();       
+           mv.ejecutar();
+            //System.out.println(IntUtils.getHexFormat(3, 0x00000004));
         } 
         catch (Exception e)
         {

@@ -39,4 +39,12 @@ public class IntUtils
     {
         return (base & 0xFFFF0000) | (valor & 0xFFFF);
     }
+    
+    public static String getHexFormat(int cantBytes, int num)
+    {
+        String cadena = "";
+        for (int i = cantBytes - 1; i >= 0; i--)
+            cadena += " " + String.format("%02X", (num >> (i*8) & 0xFF));
+        return cadena;    
+    }
 }

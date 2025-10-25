@@ -14,6 +14,7 @@ import modelo.operando.OperandoInmediato;
 import modelo.operando.OperandoMemoria;
 import modelo.operando.OperandoRegistro;
 import modelo.utils.IntUtils;
+import modelo.utils.StringUtils;
 
 /**
  *
@@ -130,7 +131,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     {
         Instruccion instruccion;
         Debugger debugger = new Debugger();
-        while (IPValido())
+        while (registros.getIP() != -1)
         {          
             instruccion = leerInstruccion();
             instruccion.ejecutar(this);
@@ -146,32 +147,22 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         this.creadorVMI.creaImagen(this.memoria.getBytes(), this.registros.getBytes(), this.tablaSegmentos.getBytes());
     }
     
-    protected boolean IPValido()
-    {
-        boolean cumple = true;
-        if (registros.getIP() == -1)
-            cumple = false;
-        else
-            try
-            {
-                int dirFisica = getPreviewDirFisica(this.registros.getIP());
-            } 
-            catch (SegmentationFaultException e)
-            {
-                cumple = false;
-            }
-        return cumple;
-    }
-    
     protected Instruccion leerInstruccion() throws SegmentationFaultException, VMException
     {
+        int dirFisica;
+        try
+        {
+            dirFisica = getPreviewDirFisica(registros.getIP());
+        } catch (SegmentationFaultException e)
+        {
+            throw new VMException("fin");
+        }
         int ins = getValorMemoria(registros.getIP(), 1);
         int tipo1 = (ins >> 6) & 0b11;
         int tipo2 = (ins >> 4) & 0b11;
         registros.setOPC(ins & 0x1F);
         registros.setOP1(getValorMemoria(registros.getIP()+1, tipo1));
         registros.setOP2(getValorMemoria(registros.getIP()+1+tipo1, tipo2));
-        //aca mostrar los bytes leidos de memoria
         registros.setOP1((registros.getOP1() & 0x00FFFFFF) | (tipo1 << 24));
         registros.setOP2((registros.getOP2() & 0x00FFFFFF) | (tipo2 << 24));
         registros.setIP(registros.getIP() + 1 + tipo1 + tipo2);
@@ -179,13 +170,22 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         if (tipo2 != 0)
         {
             int temp = registros.getOP1();
+            int temp2 = tipo1;
             registros.setOP1(registros.getOP2());
             registros.setOP2(temp);
+            tipo1 = tipo2;
+            tipo2 = temp2;
         }
         
         Instruccion instruccion = new Instruccion(registros.getOPC(), registros.getOP1(), registros.getOP2());
-        //aca hacer to string de la isntruccion si hay disassembler
-        System.out.println(instruccion.toString());
+        
+        if (this.disassembler == true)
+        {
+            String hexa = IntUtils.getHexFormat(1, ins) + IntUtils.getHexFormat(tipo2, registros.getOP2()) + IntUtils.getHexFormat(tipo1, registros.getOP1());
+            hexa += StringUtils.getEspacios(20, hexa);
+            System.out.printf("[%04X]:%s| %s %n", dirFisica, hexa, instruccion);
+        }
+        
         return instruccion;
     }
 
