@@ -255,14 +255,17 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
                 do
                 {                    
                  leido = getValorMemoria(dirLogica, 1);  
-                 hexa += IntUtils.getHexFormat(1, leido);
+                 if (i < 6)
+                 {
+                     hexa += IntUtils.getHexFormat(1, leido);
+                     i++;
+                 }
                  cadena += parserCar.numberToString(leido, 1);
-                 i++;
                  dirLogica++;
-                } while (i < 7 && leido != 0);
-                
-                if (i == 7)
-                    cadena += "...";
+                } while (leido != 0);
+                 
+                if (i == 6)
+                    hexa += " ..";
                 hexa += StringUtils.getEspacios(22, hexa);
                 System.out.printf("[%04X]:%s| \"%s\" %n", dirFisica, hexa, cadena);
             }
