@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import modelo.Memoria;
 import modelo.Registros;
 import modelo.TablaSegmentos;
+import modelo.excepciones.SegmentationFaultException;
+import modelo.excepciones.StackOverflowException;
 import modelo.excepciones.VMException;
 import modelo.utils.IntUtils;
 
@@ -113,17 +115,23 @@ public class InicializadorMV2 implements IInicializadorMV
         registros.setIP(registros.getCS() + entryPoint);
         registros.setSP(registros.getSS() + tamSS);
         
-        registros.setSP(registros.getSP()-4);
-        dirFisica = tablaSegmentos.getDirFisica(registros.getSP(), 4);
-        memoria.setValor(dirFisica, 4, punteroPunteros);
-        
-        registros.setSP(registros.getSP()-4);
-        dirFisica = tablaSegmentos.getDirFisica(registros.getSP(), 4);
-        memoria.setValor(dirFisica, 4, params.length);
-        
-        registros.setSP(registros.getSP()-4);
-        dirFisica = tablaSegmentos.getDirFisica(registros.getSP(), 4);
-        memoria.setValor(dirFisica, 4, -1);
+        try
+        {
+            registros.setSP(registros.getSP()-4);
+            dirFisica = tablaSegmentos.getDirFisica(registros.getSP(), 4);
+            memoria.setValor(dirFisica, 4, punteroPunteros);
+
+            registros.setSP(registros.getSP()-4);
+            dirFisica = tablaSegmentos.getDirFisica(registros.getSP(), 4);
+            memoria.setValor(dirFisica, 4, params.length);
+
+            registros.setSP(registros.getSP()-4);
+            dirFisica = tablaSegmentos.getDirFisica(registros.getSP(), 4);
+            memoria.setValor(dirFisica, 4, -1);
+        } catch (SegmentationFaultException e)
+        {
+           throw new StackOverflowException("stack overflow");
+        }
     }
 
     
