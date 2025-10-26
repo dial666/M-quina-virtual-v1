@@ -36,6 +36,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     private boolean breakpoint;
     private CreadorVMI creadorVMI;
     private Scanner scanner;
+    private int entryPoint;
     
     public MaquinaVirtual(Memoria memoria, Registros registros, TablaSegmentos tablaSegmentos, boolean disassembler, CreadorVMI creadorVMI)
     {
@@ -136,11 +137,9 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     {
         Instruccion instruccion;
         Debugger debugger = new Debugger();
+        this.entryPoint = registros.getIP();
         if (this.disassembler == true)
-        {
             mostrarKS();
-            System.out.print(">");
-        }
   
         while (registros.getIP() != -1)
         {   
@@ -176,16 +175,15 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     {
         int dirFisica;    
         dirFisica = getPreviewDirFisica(registros.getIP());
-        System.out.println("valor de ip: " + registros.getIP());
         int ins = getValorMemoria(registros.getIP(), 1);
         int tipo1 = (ins >> 6) & 0b11;
         int tipo2 = (ins >> 4) & 0b11;
+        String flechita;
         registros.setOPC(ins & 0x1F);
         registros.setOP1(getValorMemoria(registros.getIP()+1, tipo1));
         registros.setOP2(getValorMemoria(registros.getIP()+1+tipo1, tipo2));
         registros.setOP1((registros.getOP1() & 0x00FFFFFF) | (tipo1 << 24));
         registros.setOP2((registros.getOP2() & 0x00FFFFFF) | (tipo2 << 24));
-        registros.setIP(registros.getIP() + 1 + tipo1 + tipo2);
         
         if (tipo2 != 0)
         {
@@ -203,9 +201,11 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         {
             String hexa = IntUtils.getHexFormat(1, ins) + IntUtils.getHexFormat(tipo2, registros.getOP2()) + IntUtils.getHexFormat(tipo1, registros.getOP1());
             hexa += StringUtils.getEspacios(22, hexa);
-            System.out.printf("[%04X]:%s| %s %n", dirFisica, hexa, instruccion);
+            flechita = (registros.getIP() == this.entryPoint)? ">": " ";
+            System.out.printf("%s[%04X]:%s| %s %n", flechita, dirFisica, hexa, instruccion);
         }
         
+        registros.setIP(registros.getIP() + 1 + tipo1 + tipo2);
         return instruccion;
     }
 
@@ -277,7 +277,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
                 if (i == 6)
                     hexa += " ..";
                 hexa += StringUtils.getEspacios(22, hexa);
-                System.out.printf("[%04X]:%s| \"%s\" %n", dirFisica, hexa, cadena);
+                System.out.printf(" [%04X]:%s| \"%s\" %n", dirFisica, hexa, cadena);
             }
         } 
         catch (SegmentationFaultException e)
