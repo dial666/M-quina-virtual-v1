@@ -7,6 +7,7 @@ package modelo;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import modelo.excepciones.QuitException;
 import modelo.excepciones.SegmentationFaultException;
 import modelo.excepciones.VMException;
 import modelo.operacion.sys.parser.INumberToStringParser;
@@ -142,12 +143,26 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         }
   
         while (registros.getIP() != -1)
-        {          
-            instruccion = leerInstruccion();
+        {   
+            instruccion = null;
+            try
+            {
+                instruccion = leerInstruccion();
+            } catch (SegmentationFaultException e)
+            {
+                return;
+            }
+            
             instruccion.ejecutar(this);
             
-            if (this.breakpoint == true || this.pasoAPaso == true)
-                debugger.ejecutar(this);
+            try
+            {
+                if (this.breakpoint == true || this.pasoAPaso == true)
+                    debugger.ejecutar(this);
+            } catch (QuitException e)
+            {
+                return;
+            }
         }
     }
     
@@ -159,14 +174,9 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     
     protected Instruccion leerInstruccion() throws SegmentationFaultException, VMException
     {
-        int dirFisica;
-        try
-        {
-            dirFisica = getPreviewDirFisica(registros.getIP());
-        } catch (SegmentationFaultException e)
-        {
-            throw new VMException("");
-        }
+        int dirFisica;    
+        dirFisica = getPreviewDirFisica(registros.getIP());
+        System.out.println("valor de ip: " + registros.getIP());
         int ins = getValorMemoria(registros.getIP(), 1);
         int tipo1 = (ins >> 6) & 0b11;
         int tipo2 = (ins >> 4) & 0b11;

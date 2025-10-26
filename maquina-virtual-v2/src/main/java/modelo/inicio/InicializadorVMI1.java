@@ -24,36 +24,28 @@ public class InicializadorVMI1 implements IInicializadorMV
         int tamMemoria;
         int tamRegistros = ConstantesRegistros.getCantidadRegistros() * Integer.BYTES;
         int tamTabla = TablaSegmentos.getCantEntradas() * Integer.BYTES;
-        ByteBuffer bufferRegistros;
-        ByteBuffer bufferTabla;
-        ByteBuffer bufferMem;
         int[] arrayRegistros;
         int[] arrayTabla;
         byte[] arrayMemoria;
         int i;
         
         tamMemoria = byteBufferArch.getShort() & 0xFFFF;
+        tamMemoria = (short) (tamMemoria * 1024);
         if (tamMemoria > memoria.getTamanio())
             throw new VMException("el tamanio de la memoria de la imagen supera el tamanio de la memoria de esta maquina");
         
-        byteBufferArch = byteBufferArch.slice();
-        bufferRegistros = byteBufferArch.slice(0, tamRegistros);
-        bufferTabla = byteBufferArch.slice(tamRegistros, tamTabla);
-        bufferMem = byteBufferArch.slice(tamRegistros + tamTabla, tamMemoria);
-        
         arrayRegistros = new int[ConstantesRegistros.getCantidadRegistros()];
-        for (i = 0; i < ConstantesRegistros.getCantidadRegistros(); i++)
-            arrayRegistros[i] = bufferRegistros.getInt();
+        for (i = 0; i < arrayRegistros.length; i++)
+            arrayRegistros[i] = byteBufferArch.getInt();
         registros.setRegistros(arrayRegistros);
         
-        
         arrayTabla = new int[TablaSegmentos.getCantEntradas()];
-        for (i = 0; i < TablaSegmentos.getCantEntradas(); i++)
-            arrayTabla[i] = bufferTabla.getInt();
+        for (i = 0; i < arrayTabla.length; i++)
+            arrayTabla[i] = byteBufferArch.getInt();
         tablaSegmentos.setTablaSegmentos(arrayTabla);
         
         arrayMemoria = new byte[tamMemoria];
-        bufferMem.get(arrayMemoria);
+        byteBufferArch.get(arrayMemoria);
         memoria.setBloque(0, arrayMemoria);
     }
     
