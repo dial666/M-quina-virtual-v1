@@ -165,7 +165,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
             dirFisica = getPreviewDirFisica(registros.getIP());
         } catch (SegmentationFaultException e)
         {
-            throw new VMException("fin");
+            throw new VMException("");
         }
         int ins = getValorMemoria(registros.getIP(), 1);
         int tipo1 = (ins >> 6) & 0b11;

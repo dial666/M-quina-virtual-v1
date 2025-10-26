@@ -29,6 +29,6 @@ public class Debugger
                     mv.setPasoAPaso(true);
                 else
                     if (input.equals("q"))
-                        throw new QuitException("input debugger = q");
+                        throw new QuitException("");
     }
 }
