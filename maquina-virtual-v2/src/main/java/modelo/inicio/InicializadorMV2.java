@@ -47,7 +47,6 @@ public class InicializadorMV2 implements IInicializadorMV
         {
             indice = tablaSegmentos.agregarEntrada(tamPS);
             registros.setPS(IntUtils.putHigh(0, indice));
-            System.out.println("" + registros.getPS());
             dirFisica = tablaSegmentos.getDirFisica(registros.getPS(), tamPS);
             memoria.setBloque(dirFisica, bytesParams(params, registros.getPS()));
             punteroPunteros = registros.getPS() + tamanioParams(params);
