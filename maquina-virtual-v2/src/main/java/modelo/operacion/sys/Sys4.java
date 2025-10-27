@@ -24,7 +24,7 @@ public class Sys4 implements IOperacion{
     public void ejecutar(Operando opA, Operando opB, UnidadIO mv) throws VMException {
         int dirLogica = new OperandoRegistroE(ConstantesRegistros.EDX.getCodigo()).getValor(mv);
                 
-        System.out.printf("[%04X]: ", mv.getPreviewDirFisica(dirLogica));
+        System.out.printf(" [%04X]: ", mv.getPreviewDirFisica(dirLogica));
         int valor;
         do  {
             valor = mv.getValorMemoriaModificaReg(dirLogica, 1);

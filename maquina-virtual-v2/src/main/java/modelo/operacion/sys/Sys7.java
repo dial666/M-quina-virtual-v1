@@ -20,22 +20,8 @@ public class Sys7 implements IOperacion{
 
     @Override
     public void ejecutar(Operando opA, Operando opB, UnidadIO mv) throws VMException {
-        
-        for(int i=0; i<50; i++)
-            System.out.println();
-        
-        /*NADA FUNCIONO
-        try {
-            String os = System.getProperty("os.name");
-
-            if (os.contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } else {
-                Runtime.getRuntime().exec("clear");
-            }
-        } catch (final Exception e) {
-     
-        }*/  
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
     
 }

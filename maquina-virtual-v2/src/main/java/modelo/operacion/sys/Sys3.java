@@ -29,7 +29,7 @@ public class Sys3 implements IOperacion{
         if (maxCant < 0 )
             throw new VMException("el largo de la cadena no puede ser menor a 0");
                 
-        System.out.printf("[%04X]: ", mv.getPreviewDirFisica(dirLogica));
+        System.out.printf(" [%04X]: ", mv.getPreviewDirFisica(dirLogica));
         String cadena = mv.getScanner().nextLine();
         
         for (int i = 0; (i < maxCant || maxCant==-1) && i < cadena.length(); i++)
