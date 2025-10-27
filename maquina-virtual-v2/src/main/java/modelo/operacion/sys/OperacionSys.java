@@ -25,6 +25,9 @@ public class OperacionSys implements IOperacion
         {
             case 1 -> new Sys1();
             case 2 -> new Sys2();
+            case 3 -> new Sys3();
+            case 4 -> new Sys4();
+            case 7 -> new Sys7();
             case 0xF -> new SysF();
             default -> throw new VMException("tipo de sys desconocido");
         };

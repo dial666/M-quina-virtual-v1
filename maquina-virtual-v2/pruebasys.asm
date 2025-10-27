@@ -1,0 +1,10 @@
+main: MOV EDX, DS
+ADD EDX, 123
+MOV ECX, 5
+SYS 0x03
+
+SYS 0x04
+
+SYS 7
+sys 3
+STOP
