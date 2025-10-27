@@ -36,7 +36,7 @@ public abstract class OperacionSysSimple implements IOperacion
         setParser(modo);
         for (int i = 0; i < cantCeldas; i++)
         {
-            System.out.printf("[%04X]: ", mv.getPreviewDirFisica(dirLogica));
+            System.out.printf(" [%04X]: ", mv.getPreviewDirFisica(dirLogica));
             manipularMem(dirLogica, tamCelda, mv);
             dirLogica += tamCelda;
         }

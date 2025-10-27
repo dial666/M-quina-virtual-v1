@@ -35,7 +35,7 @@ public class CreadorVMI1 extends CreadorVMI
         byteBuffer.putShort(tamMemoria);
         FileOutputStream arch = new FileOutputStream(this.archVmi);
         arch.write("VMI25".getBytes(StandardCharsets.US_ASCII));
-        arch.write(1);
+        arch.write(new byte[]{1});
         arch.write(byteBuffer.array());
         arch.write(registros);
         arch.write(tablaSegmentos);

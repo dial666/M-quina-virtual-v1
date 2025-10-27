@@ -7,6 +7,7 @@ package modelo;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import modelo.excepciones.QuitException;
 import modelo.excepciones.SegmentationFaultException;
 import modelo.excepciones.VMException;
 import modelo.operacion.sys.parser.INumberToStringParser;
@@ -35,6 +36,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     private boolean breakpoint;
     private CreadorVMI creadorVMI;
     private Scanner scanner;
+    private int entryPoint;
     
     public MaquinaVirtual(Memoria memoria, Registros registros, TablaSegmentos tablaSegmentos, boolean disassembler, CreadorVMI creadorVMI)
     {
@@ -135,19 +137,31 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     {
         Instruccion instruccion;
         Debugger debugger = new Debugger();
+        this.entryPoint = registros.getIP();
         if (this.disassembler == true)
-        {
             mostrarKS();
-            System.out.print(">");
-        }
   
         while (registros.getIP() != -1)
-        {          
-            instruccion = leerInstruccion();
+        {   
+            instruccion = null;
+            try
+            {
+                instruccion = leerInstruccion();
+            } catch (SegmentationFaultException e)
+            {
+                return;
+            }
+            
             instruccion.ejecutar(this);
             
-            if (this.breakpoint == true || this.pasoAPaso == true)
-                debugger.ejecutar(this);
+            try
+            {
+                if (this.breakpoint == true || this.pasoAPaso == true)
+                    debugger.ejecutar(this);
+            } catch (QuitException e)
+            {
+                return;
+            }
         }
     }
     
@@ -159,23 +173,17 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
     
     protected Instruccion leerInstruccion() throws SegmentationFaultException, VMException
     {
-        int dirFisica;
-        try
-        {
-            dirFisica = getPreviewDirFisica(registros.getIP());
-        } catch (SegmentationFaultException e)
-        {
-            throw new VMException("");
-        }
+        int dirFisica;    
+        dirFisica = getPreviewDirFisica(registros.getIP());
         int ins = getValorMemoria(registros.getIP(), 1);
         int tipo1 = (ins >> 6) & 0b11;
         int tipo2 = (ins >> 4) & 0b11;
+        String flechita;
         registros.setOPC(ins & 0x1F);
         registros.setOP1(getValorMemoria(registros.getIP()+1, tipo1));
         registros.setOP2(getValorMemoria(registros.getIP()+1+tipo1, tipo2));
         registros.setOP1((registros.getOP1() & 0x00FFFFFF) | (tipo1 << 24));
         registros.setOP2((registros.getOP2() & 0x00FFFFFF) | (tipo2 << 24));
-        registros.setIP(registros.getIP() + 1 + tipo1 + tipo2);
         
         if (tipo2 != 0)
         {
@@ -193,9 +201,11 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         {
             String hexa = IntUtils.getHexFormat(1, ins) + IntUtils.getHexFormat(tipo2, registros.getOP2()) + IntUtils.getHexFormat(tipo1, registros.getOP1());
             hexa += StringUtils.getEspacios(22, hexa);
-            System.out.printf("[%04X]:%s| %s %n", dirFisica, hexa, instruccion);
+            flechita = (registros.getIP() == this.entryPoint)? ">": " ";
+            System.out.printf("%s[%04X]:%s| %s %n", flechita, dirFisica, hexa, instruccion);
         }
         
+        registros.setIP(registros.getIP() + 1 + tipo1 + tipo2);
         return instruccion;
     }
 
@@ -267,7 +277,7 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
                 if (i == 6)
                     hexa += " ..";
                 hexa += StringUtils.getEspacios(22, hexa);
-                System.out.printf("[%04X]:%s| \"%s\" %n", dirFisica, hexa, cadena);
+                System.out.printf(" [%04X]:%s| \"%s\" %n", dirFisica, hexa, cadena);
             }
         } 
         catch (SegmentationFaultException e)
