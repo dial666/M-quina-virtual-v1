@@ -26,10 +26,9 @@ public class Sys3 implements IOperacion{
         int dirLogica = new OperandoRegistroE(ConstantesRegistros.EDX.getCodigo()).getValor(mv);
         int maxCant = new OperandoRegistroE(ConstantesRegistros.ECX.getCodigo()).getValor(mv);
         
-        if (maxCant < 0 )
-            throw new VMException("el largo de la cadena no puede ser menor a 0");
+        if (maxCant < -1 )
+            throw new VMException("tamanio de cadena invalido");
                 
-        System.out.printf(" [%04X]: ", mv.getPreviewDirFisica(dirLogica));
         String cadena = mv.getScanner().nextLine();
         
         for (int i = 0; (i < maxCant || maxCant==-1) && i < cadena.length(); i++)
