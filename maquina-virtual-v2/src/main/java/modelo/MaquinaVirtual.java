@@ -139,7 +139,10 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         Debugger debugger = new Debugger();
         this.entryPoint = registros.getIP();
         if (this.disassembler == true)
+        {
             mostrarKS();
+            mostrarCS();
+        }
   
         while (registros.getIP() != -1)
         {   
@@ -197,13 +200,13 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         
         Instruccion instruccion = new Instruccion(registros.getOPC(), registros.getOP1(), registros.getOP2());
         
-        if (this.disassembler == true)
+        /*if (this.disassembler == true)
         {
             String hexa = IntUtils.getHexFormat(1, ins) + IntUtils.getHexFormat(tipo2, registros.getOP2()) + IntUtils.getHexFormat(tipo1, registros.getOP1());
             hexa += StringUtils.getEspacios(22, hexa);
             flechita = (registros.getIP() == this.entryPoint)? ">": " ";
             System.out.printf("%s[%04X]:%s| %s %n", flechita, dirFisica, hexa, instruccion);
-        }
+        }*/
         
         registros.setIP(registros.getIP() + 1 + tipo1 + tipo2);
         return instruccion;
@@ -282,6 +285,56 @@ public class MaquinaVirtual implements UnidadIO, IMaquinaVirtual, IDebuggeable
         } 
         catch (SegmentationFaultException e)
         {
+        }
+    }
+    
+    protected void mostrarCS() throws VMException
+    {
+        try
+        {
+            int dirLogica = registros.getCS();
+            int opc, op1, op2;
+            while (true)
+            {
+                int dirFisica;    
+                dirFisica = getPreviewDirFisica(dirLogica);
+                int ins = getValorMemoria(dirLogica, 1);
+                int tipo1 = (ins >> 6) & 0b11;
+                int tipo2 = (ins >> 4) & 0b11;
+                String flechita;
+                opc = (ins & 0x1F);
+                op1 = getValorMemoria(dirLogica+1, tipo1);
+                op2 = getValorMemoria(dirLogica+1+tipo1, tipo2);
+                op1 = (op1 & 0x00FFFFFF) | (tipo1 << 24);
+                op2 = (op2 & 0x00FFFFFF) | (tipo2 << 24);
+
+                if (tipo2 != 0)
+                {
+                    int temp = op1;
+                    int temp2 = tipo1;
+                    op1 = op2;
+                    op2 = temp;
+                    tipo1 = tipo2;
+                    tipo2 = temp2;
+                }
+
+                Instruccion instruccion = new Instruccion(opc, op1, op2);
+
+                if (this.disassembler == true)
+                {
+                    String hexa = IntUtils.getHexFormat(1, ins) + IntUtils.getHexFormat(tipo2, op2) + IntUtils.getHexFormat(tipo1, op1);
+                    hexa += StringUtils.getEspacios(22, hexa);
+                    flechita = (dirLogica == this.entryPoint)? ">": " ";
+                    System.out.printf("%s[%04X]:%s| %s %n", flechita, dirFisica, hexa, instruccion);
+                }
+
+                dirLogica += 1 + tipo1 + tipo2;
+                instruccion.toString();
+            }
+        } 
+        catch (SegmentationFaultException e)
+        {
+            
         }
     }
 }
